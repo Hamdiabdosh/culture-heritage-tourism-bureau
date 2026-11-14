@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+Disallow: /cms
+Disallow: /cms/
+Disallow: /login
+
+Sitemap: /sitemap.xml

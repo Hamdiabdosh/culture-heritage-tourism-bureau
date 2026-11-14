@@ -1,0 +1,1 @@
+ALTER TABLE "pages" ADD COLUMN "translations" jsonb DEFAULT '{}'::jsonb NOT NULL;

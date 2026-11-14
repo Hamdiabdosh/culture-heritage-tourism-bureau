@@ -1,0 +1,5 @@
+RewriteEngine On
+
+# If the front controller is reached as /api/... (Alias) or /... keep routing to index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ index.php [L,QSA]

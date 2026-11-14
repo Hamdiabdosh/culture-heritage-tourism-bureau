@@ -1,0 +1,27 @@
+# Dependencies & build
+node_modules/
+frontend/dist/
+**/dist/
+.next/
+*.tsbuildinfo
+
+# Local secrets & env
+.env
+.env.*
+!.env.example
+backend/config/config.php
+backend/config/config.local.php
+
+# Local-only seed with known dev password hashes — use 002_seed_placeholder.sql
+database/mysql/002_seed_dev.sql
+
+# Uploaded media (local)
+backend/storage/uploads/*
+!backend/storage/uploads/.gitkeep
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/

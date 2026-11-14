@@ -1,0 +1,79 @@
+# Live local stack:
+#   docker compose up -d --build mysql api
+# Production-like SPA + gzip (build frontend first: cd frontend && npm run build):
+#   docker compose --profile web up -d --build mysql api web
+#
+# Legacy Next Postgres only (see legacy/next/):
+#   docker compose --profile legacy up -d postgres
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    profiles: ['legacy']
+    ports:
+      - '55432:5432'
+    environment:
+      POSTGRES_USER: gov
+      POSTGRES_PASSWORD: gov
+      POSTGRES_DB: gov_website
+    volumes:
+      - gov_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U gov -d gov_website']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  mysql:
+    image: mariadb:11.8
+    ports:
+      - '3307:3306'
+    environment:
+      MYSQL_DATABASE: egwp
+      MYSQL_USER: egwp
+      MYSQL_PASSWORD: egwp
+      MYSQL_ROOT_PASSWORD: egwp_root
+    volumes:
+      - gov_mysqldata:/var/lib/mysql
+      - ./database/mysql/001_schema.sql:/docker-entrypoint-initdb.d/001_schema.sql:ro
+      # Local-only 002_seed_dev.sql is gitignored; public clones use the placeholder.
+      - ./database/mysql/002_seed_placeholder.sql:/docker-entrypoint-initdb.d/002_seed_placeholder.sql:ro
+    healthcheck:
+      test: ['CMD', 'healthcheck.sh', '--connect', '--innodb_initialized']
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  api:
+    build:
+      context: ./backend/docker
+    ports:
+      - '8080:8080'
+    volumes:
+      - ./backend:/var/www/backend
+    environment:
+      EGWP_DB_DSN: mysql:host=mysql;port=3306;dbname=egwp;charset=utf8mb4
+      EGWP_DB_USER: egwp
+      EGWP_DB_PASS: egwp
+      EGWP_INSTITUTION_ID: 11111111-1111-4111-8111-111111111111
+      EGWP_COOKIE_SECURE: '0'
+      EGWP_PUBLIC_ORIGIN: ${EGWP_PUBLIC_ORIGIN:-http://127.0.0.1:8088}
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  # Gzip + cache headers for Vite dist; proxies /api and /sitemap.xml.
+  web:
+    profiles: ['web']
+    image: nginx:1.27-alpine
+    ports:
+      - '8088:80'
+    volumes:
+      - ./frontend/dist:/usr/share/nginx/html:ro
+      - ./deploy/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api
+
+volumes:
+  gov_pgdata:
+  gov_mysqldata:

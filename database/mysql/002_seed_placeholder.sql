@@ -1,0 +1,65 @@
+-- Pass 4 seed PLACEHOLDER — do not run as-is with real secrets.
+-- Replace every REPLACE_* token. Generate UUIDs (e.g. uuidgen) for IDs.
+-- Password: store a PHP password_hash() result or a verified Better Auth scrypt hash.
+-- Never commit real passwords or production hashes into this file.
+
+-- SET NAMES utf8mb4;
+-- SET time_zone = '+00:00';
+
+-- ---------------------------------------------------------------------------
+-- 1) Institution (matches INSTITUTION_ID / config active institution)
+-- ---------------------------------------------------------------------------
+-- INSERT INTO `institutions` (
+--   `id`, `name`, `short_name`, `tagline`, `description`, `eyebrow`,
+--   `address`, `phone`, `email`, `hours`, `created_at`, `updated_at`
+-- ) VALUES (
+--   'REPLACE_INSTITUTION_UUID',           -- CHAR(36); same value as INSTITUTION_ID in PHP config
+--   'REPLACE_INSTITUTION_NAME',           -- e.g. Ministry of Example
+--   'REPLACE_SHORT_NAME',                 -- e.g. MoE
+--   NULL,                                 -- tagline
+--   NULL,                                 -- description
+--   NULL,                                 -- eyebrow
+--   NULL,                                 -- address
+--   NULL,                                 -- phone
+--   NULL,                                 -- email
+--   NULL,                                 -- hours
+--   UTC_TIMESTAMP(3),
+--   UTC_TIMESTAMP(3)
+-- );
+
+-- ---------------------------------------------------------------------------
+-- 2) Admin user
+-- ---------------------------------------------------------------------------
+-- INSERT INTO `users` (
+--   `id`, `name`, `email`, `email_verified`, `image`, `role`, `active`,
+--   `created_at`, `updated_at`
+-- ) VALUES (
+--   'REPLACE_ADMIN_USER_UUID',
+--   'REPLACE_ADMIN_NAME',
+--   'REPLACE_ADMIN_EMAIL',                -- unique
+--   1,
+--   NULL,
+--   'admin',
+--   1,
+--   UTC_TIMESTAMP(3),
+--   UTC_TIMESTAMP(3)
+-- );
+
+-- ---------------------------------------------------------------------------
+-- 3) Credential account (password column — no plaintext)
+-- ---------------------------------------------------------------------------
+-- INSERT INTO `account` (
+--   `id`, `account_id`, `provider_id`, `user_id`, `password`,
+--   `created_at`, `updated_at`
+-- ) VALUES (
+--   'REPLACE_ACCOUNT_UUID',
+--   'REPLACE_ADMIN_EMAIL',                -- Better Auth credential: usually email
+--   'credential',
+--   'REPLACE_ADMIN_USER_UUID',
+--   'REPLACE_PASSWORD_HASH',              -- password_hash(...) or verified scrypt export — NOT plaintext
+--   UTC_TIMESTAMP(3),
+--   UTC_TIMESTAMP(3)
+-- );
+
+-- Optional: empty published page shells can be added after PHP public APIs exist.
+-- Do not invent news/events/services/documents translation columns.

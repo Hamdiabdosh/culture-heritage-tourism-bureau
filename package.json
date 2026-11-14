@@ -1,0 +1,18 @@
+{
+  "name": "ethiopian-government-website-platform",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Government institution website — Vite React SPA + PHP API + MySQL",
+  "scripts": {
+    "dev": "docker compose up -d mysql api && npm --prefix frontend run dev",
+    "dev:api": "docker compose up -d mysql api",
+    "dev:web": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "typecheck": "npm --prefix frontend exec -- tsc --noEmit",
+    "smoke": "bash scripts/smoke-php-api.sh && bash scripts/smoke-cms-all.sh && bash scripts/smoke-cms-users.sh",
+    "install:web": "npm --prefix frontend install"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
