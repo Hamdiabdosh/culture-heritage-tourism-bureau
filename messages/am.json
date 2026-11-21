@@ -5,7 +5,8 @@
   "seo": {
     "homeTitle": "{name} | ኦፊሴላዊ ድረ-ገጽ",
     "homeDescription": "ከሐረሪ ባህል፣ ቅርስ እና ቱሪዝም ቢሮ ኦፊሴላዊ መረጃ — ዜና፣ ዝግጅቶች፣ ህትመቶች እና የህዝብ አገልግሎት መረጃ።",
-    "aboutDescription": "ስለ ሐረሪ ባህል፣ ቅርስ እና ቱሪዝም ቢሮ — ተቋማዊ ተልዕኮ፣ ባህል እና ቅርስ መረጃ።"
+    "aboutDescription": "ስለ ሐረሪ ባህል፣ ቅርስ እና ቱሪዝም ቢሮ — ተቋማዊ ተልዕኮ፣ ባህል እና ቅርስ መረጃ።",
+    "organizationDescription": "የ{name} አደረጃጀት — የታተሙ የሥራ ክፍሎች እና አመራር።"
   },
   "navigation": {
     "home": "መነሻ",
@@ -22,7 +23,8 @@
     "experiences": "Experiences",
     "plan": "Plan your visit",
     "stories": "ዜና",
-    "map": "Map"
+    "map": "Map",
+    "organization": "አደረጃጀት"
   },
   "header": {
     "skipToMain": "ወደ ዋናው ይዘት ይሂዱ",
@@ -313,7 +315,10 @@
       "roleAdmin": "አስተዳዳሪ",
       "roleEditor": "አርታዒ",
       "roleViewer": "ተመልካች",
-      "settings": "Site settings"
+      "settings": "Site settings",
+      "organization": "አደረጃጀት",
+      "departments": "የሥራ ክፍሎች",
+      "leadership": "አመራር"
     },
     "dashboard": {
       "welcome": "እንኳን ደህና መጡ፣ {name}",
@@ -664,6 +669,56 @@
       "lang_om": "Afaan Oromo",
       "lang_ha": "Harari",
       "unsavedChanges": "You have unsaved changes."
+    },
+    "org": {
+      "departmentsTitle": "የሥራ ክፍሎች",
+      "departmentsIntro": "በሕዝብ የአደረጃጀት ገጽ ላይ የሚታዩ ዳይሬክቶሬቶች እና ጽ/ቤቶች።",
+      "departmentsEmptyTitle": "እስካሁን የሥራ ክፍል የለም",
+      "departmentsEmptyEditor": "ስሞቻቸው እና ኃላፊነቶቻቸው በይፋ ሲረጋገጡ የሥራ ክፍሎችን ያክሉ።",
+      "departmentsEmptyViewer": "እስካሁን ምንም የሥራ ክፍል አልተጨመረም።",
+      "newDepartment": "አዲስ የሥራ ክፍል",
+      "editDepartment": "የሥራ ክፍልን አርትዕ",
+      "viewDepartment": "የሥራ ክፍልን ይመልከቱ",
+      "backToDepartments": "← የሥራ ክፍሎች",
+      "archiveDepartmentConfirm": "ይህን የሥራ ክፍል ማኅደር ውስጥ ያስቀምጡ? ከሕዝብ ድረ-ገጽ ይደበቃል።",
+      "peopleTitle": "የአመራር መገለጫዎች",
+      "peopleIntro": "የአመራር እና የሠራተኞች መገለጫዎች። በሕዝብ የአመራር ዝርዝር ውስጥ የሚታዩት እንደ አመራር የተመረጡት ብቻ ናቸው።",
+      "peopleEmptyTitle": "እስካሁን መገለጫ የለም",
+      "peopleEmptyEditor": "የተረጋገጡ ስሞች፣ ማዕረጎች እና የመገናኛ መረጃዎች ያሏቸውን መገለጫዎች ብቻ ያክሉ።",
+      "peopleEmptyViewer": "እስካሁን ምንም መገለጫ አልተጨመረም።",
+      "newPerson": "አዲስ መገለጫ",
+      "editPerson": "መገለጫ አርትዕ",
+      "viewPerson": "መገለጫ ይመልከቱ",
+      "backToPeople": "← የአመራር መገለጫዎች",
+      "archivePersonConfirm": "ይህን መገለጫ ማኅደር ውስጥ ያስቀምጡ? ከሕዝብ ድረ-ገጽ ይደበቃል።",
+      "archive": "ማኅደር ውስጥ አስቀምጥ",
+      "verifiedOnlyHint": "የተረጋገጠ ኦፊሴላዊ መረጃ ብቻ ያስገቡ። ምትክ ስሞችን ወይም ዝርዝሮችን አይጨምሩ።",
+      "sectionDetails": "ዝርዝሮች",
+      "sectionTranslations": "ትርጉሞች",
+      "translationsHintDepartments": "አማራጭ የአማርኛ፣ የአፋን ኦሮሞ እና የሐረሪ ቅጂዎች። ባዶ መስኮች በሕዝብ ድረ-ገጽ ላይ ወደ እንግሊዝኛ ይመለሳሉ።",
+      "translationsHintPeople": "የሥራ መደብ እና የሕይወት ታሪክ መተርጎም ይቻላል። ስሞች እንደገቡት ይታያሉ። ባዶ መስኮች ወደ እንግሊዝኛ ይመለሳሉ።",
+      "lang_am": "አማርኛ",
+      "lang_om": "አፋን ኦሮሞ",
+      "lang_ha": "ሐረሪ",
+      "name": "ስም",
+      "slug": "የURL መለያ",
+      "slugHint": "ትንሽ ፊደላት፣ ቁጥሮች እና ሰረዞች። ልዩ መሆን አለበት።",
+      "summary": "ማጠቃለያ",
+      "description": "መግለጫ",
+      "sortOrder": "የማሳያ ቅደም ተከተል",
+      "sortOrderHint": "ትንሽ ቁጥሮች መጀመሪያ ይታያሉ።",
+      "fullName": "ሙሉ ስም",
+      "title": "የሥራ መደብ",
+      "bio": "የሕይወት ታሪክ",
+      "email": "ኢሜይል",
+      "phone": "ስልክ",
+      "department": "የሥራ ክፍል",
+      "noDepartment": "— የሥራ ክፍል የለም —",
+      "isLeadership": "በአመራር ዝርዝር ውስጥ አሳይ",
+      "isLeadershipHint": "የአመራር መገለጫዎች ሲታተሙ በሕዝብ የአደረጃጀት ገጽ ላይ ይታያሉ።",
+      "leadershipBadge": "አመራር",
+      "staffBadge": "ሠራተኛ",
+      "unsavedChanges": "ያልተቀመጡ ለውጦች አሉ።"
     }
   },
   "privacy": {
@@ -763,5 +818,21 @@
     "itinBody": "Browse 24-hour, 3-day, and family trails with linked stops across the walled city.",
     "itinCta": "Browse itineraries",
     "quickLinks": "Quick links"
+  },
+  "organization": {
+    "eyebrow": "ቢሮው",
+    "title": "አደረጃጀት",
+    "intro": "በቢሮው የታተሙ የ{name} የሥራ ክፍሎች እና አመራር።",
+    "leadershipTitle": "አመራር",
+    "departmentsTitle": "የሥራ ክፍሎች",
+    "leadershipEmpty": "የአመራር መረጃ እስካሁን አልታተመም።",
+    "departmentsEmpty": "የሥራ ክፍሎች መረጃ እስካሁን አልታተመም።",
+    "emptyTitle": "የአደረጃጀት መረጃ በቅርቡ ይቀርባል",
+    "emptyBody": "ቢሮው የተረጋገጠ የሥራ ክፍሎች እና የአመራር መረጃ እዚህ ያትማል። ለጥያቄዎች ቢሮውን ያግኙ።",
+    "loadError": "የአደረጃጀት መረጃን አሁን መጫን አልተቻለም።",
+    "tryAgain": "እንደገና ይሞክሩ",
+    "email": "ኢሜይል",
+    "phone": "ስልክ",
+    "fallbackNotice": "አንዳንድ መረጃዎች ትርጉም ገና ስላልታተመ በእንግሊዝኛ ቀርበዋል።"
   }
 }

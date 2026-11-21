@@ -43,6 +43,9 @@
 .cms-form-section-title{font:500 18px Georgia,serif;margin:0;color:#2c1f1a}
 .cms-fieldset{border:1px solid #e0e5e0;border-radius:4px;padding:14px;margin:0;display:flex;flex-direction:column;gap:12px}
 .cms-fieldset legend{font-size:12px;font-weight:700;color:#2c1f1a;padding:0 6px}
+.cms-org-fieldset{border:0;padding:0;margin:0;min-width:0;display:flex;flex-direction:column;gap:14px}
+.cms-page-form label.cms-checkbox-row{flex-direction:row;align-items:flex-start;gap:10px}
+.cms-checkbox-row input{width:18px;height:18px;margin-top:1px;flex:none}
 .cms-field-req,.cms-field-opt{font-size:10px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;margin-left:6px}
 .cms-field-req{color:#8a5a1f}
 .cms-field-opt{color:#8a9891}

@@ -98,15 +98,17 @@ export function CmsLayout() {
         ? tNav('roleEditor')
         : tNav('roleViewer')
 
-  const nav = [
+  const nav: { to: string; label: string; end?: boolean; adminOnly?: boolean; group?: string }[] = [
     { to: '/cms', label: tNav('overview'), end: true },
     { to: '/cms/news', label: tNav('news') },
     { to: '/cms/content', label: tNav('pages') },
     { to: '/cms/services', label: tNav('services') },
     { to: '/cms/events', label: tNav('events') },
     { to: '/cms/documents', label: tNav('documents') },
-    { to: '/cms/settings', label: tNav('settings') },
-    { to: '/cms/users', label: tNav('users'), adminOnly: true as const },
+    { to: '/cms/departments', label: tNav('departments'), group: tNav('organization') },
+    { to: '/cms/people', label: tNav('leadership') },
+    { to: '/cms/settings', label: tNav('settings'), group: tNav('administration') },
+    { to: '/cms/users', label: tNav('users'), adminOnly: true },
   ]
 
   const visible = nav.filter((item) => !item.adminOnly || user.role === 'admin')
@@ -133,9 +135,12 @@ export function CmsLayout() {
         </div>
         <nav className="cms-nav" aria-label={tNav('ariaNav')}>
           {visible.map((item) => (
-            <NavLink key={item.to} to={item.to} end={Boolean(item.end)}>
-              {item.label}
-            </NavLink>
+            <div key={item.to} className="cms-nav-item-wrap">
+              {item.group ? <span className="cms-nav-label">{item.group}</span> : null}
+              <NavLink to={item.to} end={Boolean(item.end)}>
+                {item.label}
+              </NavLink>
+            </div>
           ))}
         </nav>
         <div className="cms-sidebar-foot">

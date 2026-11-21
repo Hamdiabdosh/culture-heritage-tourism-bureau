@@ -2,12 +2,14 @@
 declare(strict_types=1);
 
 use App\Controllers\AuthController;
+use App\Controllers\DepartmentsController;
 use App\Controllers\DocumentsController;
 use App\Controllers\EventsController;
 use App\Controllers\InstitutionController;
 use App\Controllers\MediaController;
 use App\Controllers\NewsController;
 use App\Controllers\PagesController;
+use App\Controllers\PeopleController;
 use App\Controllers\ServicesController;
 use App\Controllers\SitemapController;
 use App\Controllers\UsersController;
@@ -40,6 +42,10 @@ return [
     ['method' => 'GET', 'pattern' => '/documents', 'handler' => [DocumentsController::class, 'publicList']],
     ['method' => 'GET', 'pattern' => '/documents/{slug}', 'handler' => [DocumentsController::class, 'publicShow']],
     ['method' => 'GET', 'pattern' => '/media/{file}', 'handler' => [MediaController::class, 'publicShow']],
+    ['method' => 'GET', 'pattern' => '/departments', 'handler' => [DepartmentsController::class, 'publicList']],
+    ['method' => 'GET', 'pattern' => '/departments/{slug}', 'handler' => [DepartmentsController::class, 'publicShow']],
+    ['method' => 'GET', 'pattern' => '/leadership', 'handler' => [PeopleController::class, 'publicLeadership']],
+    ['method' => 'GET', 'pattern' => '/people/{slug}', 'handler' => [PeopleController::class, 'publicShow']],
 
     // CMS — media
     ['method' => 'POST', 'pattern' => '/cms/media', 'handler' => [MediaController::class, 'cmsUpload']],
@@ -78,6 +84,18 @@ return [
     ['method' => 'POST', 'pattern' => '/cms/documents', 'handler' => [DocumentsController::class, 'cmsCreate']],
     ['method' => 'PUT', 'pattern' => '/cms/documents/{id}', 'handler' => [DocumentsController::class, 'cmsUpdate']],
     ['method' => 'DELETE', 'pattern' => '/cms/documents/{id}', 'handler' => [DocumentsController::class, 'cmsArchive']],
+
+    // CMS — organization
+    ['method' => 'GET', 'pattern' => '/cms/departments', 'handler' => [DepartmentsController::class, 'cmsList']],
+    ['method' => 'GET', 'pattern' => '/cms/departments/{id}', 'handler' => [DepartmentsController::class, 'cmsShow']],
+    ['method' => 'POST', 'pattern' => '/cms/departments', 'handler' => [DepartmentsController::class, 'cmsCreate']],
+    ['method' => 'PUT', 'pattern' => '/cms/departments/{id}', 'handler' => [DepartmentsController::class, 'cmsUpdate']],
+    ['method' => 'DELETE', 'pattern' => '/cms/departments/{id}', 'handler' => [DepartmentsController::class, 'cmsArchive']],
+    ['method' => 'GET', 'pattern' => '/cms/people', 'handler' => [PeopleController::class, 'cmsList']],
+    ['method' => 'GET', 'pattern' => '/cms/people/{id}', 'handler' => [PeopleController::class, 'cmsShow']],
+    ['method' => 'POST', 'pattern' => '/cms/people', 'handler' => [PeopleController::class, 'cmsCreate']],
+    ['method' => 'PUT', 'pattern' => '/cms/people/{id}', 'handler' => [PeopleController::class, 'cmsUpdate']],
+    ['method' => 'DELETE', 'pattern' => '/cms/people/{id}', 'handler' => [PeopleController::class, 'cmsArchive']],
 
     // CMS — users
     ['method' => 'GET', 'pattern' => '/cms/users', 'handler' => [UsersController::class, 'cmsList']],

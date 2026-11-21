@@ -5,7 +5,7 @@
 | **Project** | Harari Culture, Heritage & Tourism Bureau — official institutional website |
 | **Repository** | https://github.com/Hamdiabdosh/culture-heritage-tourism-bureau |
 | **Date** | 21 November 2026 |
-| **Status** | Planning approved; **Phase 2.1 implemented locally (awaiting review/commit)** |
+| **Status** | Planning approved; Phase 2.1 committed (`c595921`); **Phase 2.2 implemented locally (awaiting review/commit)** |
 | **Planning commit** | `e51990f945f9d943bf6077babab95b313ec28c7d` |
 | **Depends on** | Phase 0 audit, Phase 1 identity (`7a36129`), Roadmap V1 |
 
@@ -165,6 +165,16 @@ erDiagram
 | CMS | Leadership manager |
 
 **Do not seed invented people.** Empty table until Bureau supplies verified data.
+
+**As implemented in 2.2 (differs from the proposal above):**
+
+- `photo_media_id` is **not** created yet. It is added with `media_assets` in 2.3; no interim `photo_url` column, to avoid a second migration path.
+- `people.department_id` uses a composite FK `(institution_id, department_id) → departments(institution_id, id)` `ON DELETE RESTRICT`, so a person cannot point at another institution's department.
+- `DELETE` on both resources is a soft archive. Archiving a department returns **409** while non-archived people still reference it; new links to an archived department are rejected (400).
+- Public responses expose a person's department only when that department is published.
+- `full_name` is not translated; `title` and `bio` are. Department `name`/`summary`/`description` are translated.
+- `/organization` is a single page (open decision 3 resolved). Detail endpoints exist for future use; no nested public routes.
+- The Organization nav link ships with 2.2 (moved forward from 2.7).
 
 #### `content_entries` (new — Culture & Heritage archive)
 
@@ -379,7 +389,7 @@ Compatibility: old frontend continues if new columns nullable; new frontend feat
 | Step | Work | Depends |
 | --- | --- | --- |
 | **2.1** | SQL `007` institution profile fields + API/CMS settings + About integration | Approval ✓ |
-| 2.2 | SQL `008` departments + people + APIs/CMS + `/organization` | 2.1 |
+| **2.2** | SQL `008` departments + people + APIs/CMS + `/organization` (implemented, awaiting review) | 2.1 ✓ |
 | 2.3 | SQL `009`–`010` categories, media_assets, content_entries + culture/heritage routes | 2.2 |
 | 2.4 | SQL `011` extend news/events/documents/services + public filters; add `/news` with `/stories` redirect | 2.1 |
 | 2.5 | Freeform pages unlock (separate slice) — archive VisitHarar guide pages | After 2.1 review |
@@ -413,7 +423,7 @@ PDF binary upload remains deferred. Phase 3 deepens translations once hooks exis
 
 1. Timing/owner for live `institutions` identity rename after verified Bureau copy.
 2. Exact `entry_type` vocabulary for culture/heritage.
-3. Whether `/organization` is a single page or nested routes.
+3. ~~Whether `/organization` is a single page or nested routes.~~ Single page (2.2).
 4. When to run freeform-pages unlock relative to 2.2–2.4.
 
 ---

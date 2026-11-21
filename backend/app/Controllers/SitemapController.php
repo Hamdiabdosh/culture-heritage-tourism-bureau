@@ -17,7 +17,7 @@ final class SitemapController
         /** @var list<array{loc:string,lastmod:?string}> $urls */
         $urls = [];
 
-        $static = ['/', '/about', '/contact', '/privacy', '/news', '/services', '/events', '/resources'];
+        $static = ['/', '/about', '/organization', '/contact', '/privacy', '/news', '/services', '/events', '/resources'];
         foreach ($static as $path) {
             $urls[] = ['loc' => $origin . $path, 'lastmod' => null];
         }

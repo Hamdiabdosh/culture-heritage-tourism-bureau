@@ -26,6 +26,7 @@ export function PublicShell({ institution }: { institution: Institution | null }
   const nav = [
     { to: '/', label: tNav('home'), end: true },
     { to: '/about', label: tNav('about') },
+    { to: '/organization', label: tNav('organization') },
     { to: '/stories', label: tNav('news') },
     { to: '/events', label: tNav('events') },
     { to: '/resources', label: tNav('resources') },
@@ -127,6 +128,7 @@ export function PublicShell({ institution }: { institution: Institution | null }
           <div>
             <h3>{tFooter('explore')}</h3>
             <Link to="/about">{tNav('about')}</Link>
+            <Link to="/organization">{tNav('organization')}</Link>
             <Link to="/stories">{tNav('news')}</Link>
             <Link to="/events">{tNav('events')}</Link>
             <Link to="/resources">{tNav('resources')}</Link>

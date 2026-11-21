@@ -5,7 +5,8 @@
   "seo": {
     "homeTitle": "{name} | Official website",
     "homeDescription": "Official information from the Harari Culture, Heritage & Tourism Bureau — news, events, publications, and public services.",
-    "aboutDescription": "About the Harari Culture, Heritage & Tourism Bureau — institutional mandate, culture, and heritage information."
+    "aboutDescription": "About the Harari Culture, Heritage & Tourism Bureau — institutional mandate, culture, and heritage information.",
+    "organizationDescription": "Organizational structure of {name} — published departments and leadership."
   },
   "navigation": {
     "home": "Home",
@@ -22,7 +23,8 @@
     "experiences": "Experiences",
     "plan": "Plan your visit",
     "stories": "News",
-    "map": "Map"
+    "map": "Map",
+    "organization": "Organization"
   },
   "header": {
     "skipToMain": "Skip to main content",
@@ -304,7 +306,10 @@
       "roleAdmin": "Admin",
       "roleEditor": "Editor",
       "roleViewer": "Viewer",
-      "settings": "Site settings"
+      "settings": "Site settings",
+      "organization": "Organization",
+      "departments": "Departments",
+      "leadership": "Leadership"
     },
     "dashboard": {
       "welcome": "Welcome, {name}",
@@ -656,6 +661,56 @@
       "lang_om": "Afaan Oromo",
       "lang_ha": "Harari",
       "unsavedChanges": "You have unsaved changes."
+    },
+    "org": {
+      "departmentsTitle": "Departments",
+      "departmentsIntro": "Directorates and offices shown on the public Organization page.",
+      "departmentsEmptyTitle": "No departments yet",
+      "departmentsEmptyEditor": "Add departments once their names and responsibilities are officially confirmed.",
+      "departmentsEmptyViewer": "No departments have been added yet.",
+      "newDepartment": "New department",
+      "editDepartment": "Edit department",
+      "viewDepartment": "View department",
+      "backToDepartments": "← Departments",
+      "archiveDepartmentConfirm": "Archive this department? It will be hidden from the public site.",
+      "peopleTitle": "Leadership profiles",
+      "peopleIntro": "Leadership and staff profiles. Only profiles marked as leadership appear in the public leadership list.",
+      "peopleEmptyTitle": "No profiles yet",
+      "peopleEmptyEditor": "Add profiles only with verified names, titles, and contact details.",
+      "peopleEmptyViewer": "No profiles have been added yet.",
+      "newPerson": "New profile",
+      "editPerson": "Edit profile",
+      "viewPerson": "View profile",
+      "backToPeople": "← Leadership profiles",
+      "archivePersonConfirm": "Archive this profile? It will be hidden from the public site.",
+      "archive": "Archive",
+      "verifiedOnlyHint": "Enter only verified official information. Do not add placeholder names or details.",
+      "sectionDetails": "Details",
+      "sectionTranslations": "Translations",
+      "translationsHintDepartments": "Optional Amharic, Afaan Oromo, and Harari versions. Empty fields fall back to English on the public site.",
+      "translationsHintPeople": "Position title and biography can be translated. Names are shown as entered. Empty fields fall back to English.",
+      "lang_am": "Amharic",
+      "lang_om": "Afaan Oromo",
+      "lang_ha": "Harari",
+      "name": "Name",
+      "slug": "URL slug",
+      "slugHint": "Lowercase letters, numbers, and hyphens. Must be unique.",
+      "summary": "Summary",
+      "description": "Description",
+      "sortOrder": "Display order",
+      "sortOrderHint": "Lower numbers appear first.",
+      "fullName": "Full name",
+      "title": "Position title",
+      "bio": "Biography",
+      "email": "Email",
+      "phone": "Phone",
+      "department": "Department",
+      "noDepartment": "— No department —",
+      "isLeadership": "Show in leadership list",
+      "isLeadershipHint": "Leadership profiles appear on the public Organization page when published.",
+      "leadershipBadge": "Leadership",
+      "staffBadge": "Staff",
+      "unsavedChanges": "You have unsaved changes."
     }
   },
   "privacy": {
@@ -755,5 +810,21 @@
     "itinBody": "Browse 24-hour, 3-day, and family trails with linked stops across the walled city.",
     "itinCta": "Browse itineraries",
     "quickLinks": "Quick links"
+  },
+  "organization": {
+    "eyebrow": "The Bureau",
+    "title": "Organization",
+    "intro": "Departments and leadership of {name}, as published by the Bureau.",
+    "leadershipTitle": "Leadership",
+    "departmentsTitle": "Departments",
+    "leadershipEmpty": "Leadership profiles have not been published yet.",
+    "departmentsEmpty": "Department information has not been published yet.",
+    "emptyTitle": "Organization details coming soon",
+    "emptyBody": "The Bureau will publish verified department and leadership information here. For enquiries, please contact the office.",
+    "loadError": "We could not load organization details right now.",
+    "tryAgain": "Try again",
+    "email": "Email",
+    "phone": "Phone",
+    "fallbackNotice": "Some details are shown in English because a translation has not been published yet."
   }
 }

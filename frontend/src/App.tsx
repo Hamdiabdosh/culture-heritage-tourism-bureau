@@ -11,6 +11,7 @@ import { CmsInstitutionSettingsPage } from './pages/cms/InstitutionSettingsPage'
 import { CmsNewsEditPage } from './pages/cms/NewsEditPage'
 import { CmsNewsListPage } from './pages/cms/NewsListPage'
 import { CmsNewsNewPage } from './pages/cms/NewsNewPage'
+import { CmsOrgEditPage, CmsOrgListPage } from './pages/cms/OrganizationPages'
 import { CmsPagesGuideListPage } from './pages/cms/PagesGuideListPage'
 import { CmsPlanEditPage } from './pages/cms/PlanEditPage'
 import { CmsUsersPage } from './pages/cms/UsersPage'
@@ -24,6 +25,7 @@ import { LoginPage } from './pages/LoginPage'
 import { MapTeaserPage } from './pages/MapTeaserPage'
 import { NewsDetailPage } from './pages/NewsDetailPage'
 import { NewsListPage } from './pages/NewsListPage'
+import { OrganizationPage } from './pages/OrganizationPage'
 import { PlanItinerariesPage } from './pages/PlanItinerariesPage'
 import { PlanPage } from './pages/PlanPage'
 import { ResourceDetailPage } from './pages/ResourceDetailPage'
@@ -84,12 +86,19 @@ export function App() {
             path="documents/:id"
             element={<CmsEntityEditPage entityKey="documents" mode="edit" />}
           />
+          <Route path="departments" element={<CmsOrgListPage kind="departments" />} />
+          <Route path="departments/new" element={<CmsOrgEditPage kind="departments" mode="create" />} />
+          <Route path="departments/:id" element={<CmsOrgEditPage kind="departments" mode="edit" />} />
+          <Route path="people" element={<CmsOrgListPage kind="people" />} />
+          <Route path="people/new" element={<CmsOrgEditPage kind="people" mode="create" />} />
+          <Route path="people/:id" element={<CmsOrgEditPage kind="people" mode="edit" />} />
           <Route path="users" element={<CmsUsersPage />} />
         </Route>
 
         <Route element={<PublicShell institution={institution} />}>
           <Route index element={<HomePage />} />
           <Route path="about" element={<AboutPage />} />
+          <Route path="organization" element={<OrganizationPage />} />
           <Route path="contact" element={<ContactPage />} />
           <Route path="privacy" element={<PrivacyPage />} />
           <Route path="explore" element={<ServicesListPage mode="attractions" />} />

@@ -475,6 +475,109 @@ export const documentsApi = {
   ...cmsCrud<CmsDocument, DocumentInput>('documents'),
 }
 
+export type TranslationLang = 'am' | 'om' | 'ha'
+export type TranslationMap = Partial<Record<TranslationLang, Record<string, string>>>
+
+function langQuery(lang?: string): string {
+  return lang && lang !== 'en' ? `?lang=${encodeURIComponent(lang)}` : ''
+}
+
+export type PublicDepartment = {
+  slug: string
+  name: string
+  summary: string | null
+  description: string | null
+  sortOrder: number
+  language: string
+  usedFallback: boolean
+}
+
+export type PublicPerson = {
+  slug: string
+  fullName: string
+  title: string
+  bio: string | null
+  email: string | null
+  phone: string | null
+  isLeadership: boolean
+  sortOrder: number
+  department: { slug: string; name: string } | null
+  language: string
+  usedFallback: boolean
+}
+
+export type CmsDepartment = {
+  id: string
+  slug: string
+  name: string
+  summary: string | null
+  description: string | null
+  sortOrder: number
+  status: ContentStatus
+  translations: TranslationMap
+  createdAt: string | null
+  updatedAt: string | null
+}
+
+export type DepartmentInput = {
+  name: string
+  slug: string
+  summary: string
+  description: string
+  sortOrder: number
+  status: ContentStatus
+  translations: TranslationMap
+}
+
+export type CmsPerson = {
+  id: string
+  departmentId: string | null
+  slug: string
+  fullName: string
+  title: string
+  bio: string | null
+  email: string | null
+  phone: string | null
+  sortOrder: number
+  isLeadership: boolean
+  status: ContentStatus
+  translations: TranslationMap
+  createdAt: string | null
+  updatedAt: string | null
+}
+
+export type PersonInput = {
+  fullName: string
+  slug: string
+  title: string
+  bio: string
+  email: string
+  phone: string
+  departmentId: string | null
+  sortOrder: number
+  isLeadership: boolean
+  status: ContentStatus
+  translations: TranslationMap
+}
+
+export const departmentsApi = {
+  async list(lang?: string): Promise<PublicDepartment[]> {
+    const data = await apiFetch<ItemsResponse<PublicDepartment>>(`/api/departments${langQuery(lang)}`)
+    return data.items
+  },
+
+  ...cmsCrud<CmsDepartment, DepartmentInput>('departments'),
+}
+
+export const peopleApi = {
+  async leadership(lang?: string): Promise<PublicPerson[]> {
+    const data = await apiFetch<ItemsResponse<PublicPerson>>(`/api/leadership${langQuery(lang)}`)
+    return data.items
+  },
+
+  ...cmsCrud<CmsPerson, PersonInput>('people'),
+}
+
 export const usersApi = {
   async list(): Promise<CmsUser[]> {
     const data = await apiFetch<{ items: CmsUser[] }>('/api/cms/users')

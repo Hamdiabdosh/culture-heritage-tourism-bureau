@@ -96,6 +96,123 @@ function require_content_status(mixed $value): string
     return $status;
 }
 
+/** Public `?lang=` → en|am|om|ha (unknown → en). */
+function request_lang(): string
+{
+    $raw = strtolower(trim((string) ($_GET['lang'] ?? 'en')));
+    return in_array($raw, ['en', 'am', 'om', 'ha'], true) ? $raw : 'en';
+}
+
+/** Trimmed text with tags + control chars removed; 400 when over $maxLen. */
+function plain_text(mixed $raw, int $maxLen, string $label): string
+{
+    if ($raw !== null && !is_string($raw) && !is_int($raw) && !is_float($raw)) {
+        json_error(400, 'VALIDATION', "{$label} must be text.");
+    }
+    $s = trim(strip_tags((string) ($raw ?? '')));
+    $s = preg_replace("/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/u", '', $s) ?? '';
+    if (mb_strlen($s) > $maxLen) {
+        json_error(400, 'VALIDATION', "{$label} must be at most {$maxLen} characters.");
+    }
+    return $s;
+}
+
+/**
+ * Strict `{ am|om|ha: { field: string } }` validation. Unknown languages/fields → 400.
+ *
+ * @param array<string, int> $fields field => max length
+ * @return array<string, array<string, string>>
+ */
+function normalize_translations(mixed $raw, array $fields): array
+{
+    if ($raw === null || $raw === []) {
+        return [];
+    }
+    if (!is_array($raw) || array_is_list($raw)) {
+        json_error(400, 'VALIDATION', 'translations must be an object keyed by am, om, or ha.');
+    }
+    $out = [];
+    foreach ($raw as $lang => $entry) {
+        if (!in_array($lang, ['am', 'om', 'ha'], true)) {
+            json_error(400, 'VALIDATION', 'translations keys must be am, om, or ha.');
+        }
+        if ($entry === null) {
+            continue;
+        }
+        if (!is_array($entry) || ($entry !== [] && array_is_list($entry))) {
+            json_error(400, 'VALIDATION', "translations.{$lang} must be an object.");
+        }
+        $norm = [];
+        foreach ($entry as $key => $value) {
+            if (!is_string($key) || !isset($fields[$key])) {
+                json_error(400, 'VALIDATION', "Unsupported translations.{$lang}.{$key}.");
+            }
+            $text = plain_text($value, $fields[$key], "translations.{$lang}.{$key}");
+            if ($text !== '') {
+                $norm[$key] = $text;
+            }
+        }
+        if ($norm !== []) {
+            $out[$lang] = $norm;
+        }
+    }
+    return $out;
+}
+
+/** @return array<string, mixed> */
+function decode_json_object(mixed $value): array
+{
+    if (is_string($value) && $value !== '') {
+        $decoded = json_decode($value, true);
+        return is_array($decoded) ? $decoded : [];
+    }
+    return is_array($value) ? $value : [];
+}
+
+/**
+ * Locale → English fallback per field. usedFallback is true when any non-empty
+ * English field had no translation in the requested locale.
+ *
+ * @param array<string, ?string> $base English values for translatable fields
+ * @return array{values: array<string, ?string>, language: string, usedFallback: bool}
+ */
+function resolve_translations(array $base, mixed $translations, string $lang): array
+{
+    if ($lang === 'en') {
+        return ['values' => $base, 'language' => 'en', 'usedFallback' => false];
+    }
+    $entry = decode_json_object($translations)[$lang] ?? [];
+    $values = [];
+    $usedFallback = false;
+    foreach ($base as $key => $english) {
+        $tr = is_array($entry) && isset($entry[$key]) ? trim((string) $entry[$key]) : '';
+        if ($tr !== '') {
+            $values[$key] = $tr;
+        } else {
+            $values[$key] = $english;
+            if ($english !== null && $english !== '') {
+                $usedFallback = true;
+            }
+        }
+    }
+    return ['values' => $values, 'language' => $lang, 'usedFallback' => $usedFallback];
+}
+
+function parse_sort_order(mixed $raw): int
+{
+    if ($raw === null || $raw === '') {
+        return 0;
+    }
+    if (filter_var($raw, FILTER_VALIDATE_INT) === false) {
+        json_error(400, 'VALIDATION', 'Display order must be a whole number.');
+    }
+    $n = (int) $raw;
+    if ($n < -100000 || $n > 100000) {
+        json_error(400, 'VALIDATION', 'Display order is out of range.');
+    }
+    return $n;
+}
+
 function is_duplicate_key(PDOException $e): bool
 {
     return $e->getCode() === '23000' || str_contains($e->getMessage(), 'Duplicate');

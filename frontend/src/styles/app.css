@@ -546,3 +546,22 @@ button, input { font: inherit; }
 .about-profile-block p,.about-profile-block li{color:var(--muted);font-size:15px;line-height:1.8}
 .about-profile-block ul{margin:0;padding-left:20px}
 .about-history{white-space:pre-wrap}
+
+.org-sections{display:flex;flex-direction:column;gap:56px}
+.org-section h2{font:500 30px Georgia,serif;margin:0 0 22px}
+.org-card{min-height:0}
+.org-card h3{margin:12px 0 6px}
+.org-role{font-weight:700;color:var(--ink)!important}
+.org-text{margin-top:12px!important;white-space:pre-wrap}
+.org-contact{margin:16px 0 0;font-size:13px}
+.org-contact dt{color:var(--muted);font-size:11px;margin-top:8px}
+.org-contact dd{margin:2px 0 0;overflow-wrap:anywhere}
+.org-fallback{margin:0;font-size:13px}
+
+/* Seven primary nav items need ~1000px; collapse the header menu earlier than the 800px layout breakpoint. */
+@media (max-width:1100px){
+  .desktop-nav{display:none}
+  .mobile-menu{display:grid;place-items:center;background:none;border:0;color:var(--green)}
+  .mobile-nav{display:flex;flex-direction:column;background:#fff;border-top:1px solid var(--line);padding:8px 17px 16px}
+  .mobile-nav a{display:flex;justify-content:space-between;padding:15px 0;border-bottom:1px solid var(--line);font-weight:700;font-size:14px}
+}

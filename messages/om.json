@@ -5,7 +5,8 @@
   "seo": {
     "homeTitle": "{name} | Official website",
     "homeDescription": "Official information from the Harari Culture, Heritage & Tourism Bureau — news, events, publications, and public services.",
-    "aboutDescription": "About the Harari Culture, Heritage & Tourism Bureau — institutional mandate, culture, and heritage information."
+    "aboutDescription": "About the Harari Culture, Heritage & Tourism Bureau — institutional mandate, culture, and heritage information.",
+    "organizationDescription": "Caasaa dhaabbataa {name} — kutaalee fi hoggansa maxxanfame."
   },
   "navigation": {
     "home": "Home",
@@ -22,7 +23,8 @@
     "experiences": "Experiences",
     "plan": "Plan your visit",
     "stories": "News",
-    "map": "Map"
+    "map": "Map",
+    "organization": "Caasaa dhaabbataa"
   },
   "header": {
     "skipToMain": "Gara qabiyyee ijootti darbii",
@@ -313,7 +315,10 @@
       "roleAdmin": "Bulchaa",
       "roleEditor": "Gulaalaa",
       "roleViewer": "Ilaalaa",
-      "settings": "Site settings"
+      "settings": "Site settings",
+      "organization": "Caasaa dhaabbataa",
+      "departments": "Kutaalee",
+      "leadership": "Hoggansa"
     },
     "dashboard": {
       "welcome": "Baga nagaan dhuftan, {name}",
@@ -664,6 +669,56 @@
       "lang_om": "Afaan Oromo",
       "lang_ha": "Harari",
       "unsavedChanges": "You have unsaved changes."
+    },
+    "org": {
+      "departmentsTitle": "Kutaalee",
+      "departmentsIntro": "Daarektoreetii fi waajjiraalee fuula Caasaa dhaabbataa uummataa irratti mul'atan.",
+      "departmentsEmptyTitle": "Hanga ammaatti kutaan hin jiru",
+      "departmentsEmptyEditor": "Maqaa fi itti gaafatamummaan isaanii erga mirkanaa'ee booda kutaalee dabali.",
+      "departmentsEmptyViewer": "Hanga ammaatti kutaan tokkollee hin dabalamne.",
+      "newDepartment": "Kutaa haaraa",
+      "editDepartment": "Kutaa gulaali",
+      "viewDepartment": "Kutaa ilaali",
+      "backToDepartments": "← Kutaalee",
+      "archiveDepartmentConfirm": "Kutaa kana kuusaa keessa kaa'uu? Marsariitii uummataa irraa ni dhokata.",
+      "peopleTitle": "Ibsa hoggansaa",
+      "peopleIntro": "Ibsa hoggansaa fi hojjettootaa. Tarree hoggansaa uummataa irratti kan mul'atan warra akka hoggansaatti mallattoo godhaman qofa.",
+      "peopleEmptyTitle": "Hanga ammaatti ibsi hin jiru",
+      "peopleEmptyEditor": "Ibsa maqaa, gahee fi odeeffannoo qunnamtii mirkanaa'e qofa qabu dabali.",
+      "peopleEmptyViewer": "Hanga ammaatti ibsi tokkollee hin dabalamne.",
+      "newPerson": "Ibsa haaraa",
+      "editPerson": "Ibsa gulaali",
+      "viewPerson": "Ibsa ilaali",
+      "backToPeople": "← Ibsa hoggansaa",
+      "archivePersonConfirm": "Ibsa kana kuusaa keessa kaa'uu? Marsariitii uummataa irraa ni dhokata.",
+      "archive": "Kuusaa keessa kaa'i",
+      "verifiedOnlyHint": "Odeeffannoo sirrii mirkanaa'e qofa galchi. Maqaa ykn bal'ina bakka bu'aa hin dabalin.",
+      "sectionDetails": "Bal'ina",
+      "sectionTranslations": "Hiikkaawwan",
+      "translationsHintDepartments": "Hiikkaa filannoo Afaan Amaaraa, Afaan Oromoo fi Harariin. Dirreewwan duwwaan marsariitii uummataa irratti Afaan Ingiliziitiin bakka bu'u.",
+      "translationsHintPeople": "Gaheen hojii fi seenaan jireenyaa hiikamuu danda'u. Maqaaleen akkuma galfameetti mul'atu. Dirreewwan duwwaan Afaan Ingiliziitiin bakka bu'u.",
+      "lang_am": "Afaan Amaaraa",
+      "lang_om": "Afaan Oromoo",
+      "lang_ha": "Afaan Harari",
+      "name": "Maqaa",
+      "slug": "Eenyummeessaa URL",
+      "slugHint": "Qubee xiqqaa, lakkoofsaa fi sarara. Adda ta'uu qaba.",
+      "summary": "Cuunfaa",
+      "description": "Ibsa",
+      "sortOrder": "Tartiiba agarsiisaa",
+      "sortOrderHint": "Lakkoofsi xiqqaan dura mul'ata.",
+      "fullName": "Maqaa guutuu",
+      "title": "Gahee hojii",
+      "bio": "Seenaa jireenyaa",
+      "email": "Imeelii",
+      "phone": "Bilbila",
+      "department": "Kutaa",
+      "noDepartment": "— Kutaa malee —",
+      "isLeadership": "Tarree hoggansaa keessatti agarsiisi",
+      "isLeadershipHint": "Ibsi hoggansaa yeroo maxxanfamu fuula Caasaa dhaabbataa uummataa irratti mul'ata.",
+      "leadershipBadge": "Hoggansa",
+      "staffBadge": "Hojjetaa",
+      "unsavedChanges": "Jijjiiramni hin olkaa'amne jira."
     }
   },
   "privacy": {
@@ -763,5 +818,21 @@
     "itinBody": "Browse 24-hour, 3-day, and family trails with linked stops across the walled city.",
     "itinCta": "Browse itineraries",
     "quickLinks": "Quick links"
+  },
+  "organization": {
+    "eyebrow": "Biiroo",
+    "title": "Caasaa dhaabbataa",
+    "intro": "Kutaalee fi hoggansa {name}, akka Biiroon maxxanseetti.",
+    "leadershipTitle": "Hoggansa",
+    "departmentsTitle": "Kutaalee",
+    "leadershipEmpty": "Odeeffannoon hoggansaa hanga ammaatti hin maxxanfamne.",
+    "departmentsEmpty": "Odeeffannoon kutaalee hanga ammaatti hin maxxanfamne.",
+    "emptyTitle": "Odeeffannoon caasaa dhaabbataa dhiyootti ni dhiyaata",
+    "emptyBody": "Biiroon odeeffannoo kutaalee fi hoggansaa mirkanaa'e asitti ni maxxansa. Gaaffiif waajjira qunnamaa.",
+    "loadError": "Odeeffannoo caasaa dhaabbataa amma fe'uu hin dandeenye.",
+    "tryAgain": "Irra deebi'ii yaali",
+    "email": "Imeelii",
+    "phone": "Bilbila",
+    "fallbackNotice": "Hiikkaan hanga ammaatti waan hin maxxanfamneef odeeffannoon tokko tokko Afaan Ingiliziin dhiyaateera."
   }
 }
