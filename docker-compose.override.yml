@@ -1,0 +1,5 @@
+# Local port remap — host 8080 is already in use by another stack.
+services:
+  api:
+    ports: !override
+      - '8081:8080'
