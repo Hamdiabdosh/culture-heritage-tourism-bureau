@@ -17,12 +17,12 @@ export function setJsonLd(id: string, data: Record<string, unknown> | null) {
   el.textContent = JSON.stringify(data)
 }
 
-/** TourismOrganization JSON-LD for VisitHarar (kept name for existing call sites). */
+/** GovernmentOrganization JSON-LD for the Bureau site (function name kept for call sites). */
 export function governmentOrgLd(institution: Institution | null | undefined): Record<string, unknown> | null {
   if (!institution) return null
   return {
     '@context': 'https://schema.org',
-    '@type': 'TouristInformationCenter',
+    '@type': 'GovernmentOrganization',
     name: institution.name,
     alternateName: institution.shortName ?? undefined,
     description: institution.description ?? institution.tagline ?? undefined,

@@ -7,7 +7,7 @@ import { siteTemplate } from '../lib/site-template'
 import { formatDocumentTitle } from '../lib/use-document-title'
 import { usePageHead } from '../lib/use-page-head'
 
-/** /about — static Visit Harar copy; contact sidebar from institution settings. */
+/** /about — institutional About copy (messages); contact sidebar from institution settings. */
 export function AboutPage() {
   const { locale, ready } = useI18n()
   const t = useT('about')

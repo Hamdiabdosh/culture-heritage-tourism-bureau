@@ -21,13 +21,14 @@ export function PublicShell({ institution }: { institution: Institution | null }
   const shortName = institution?.shortName ?? siteTemplate.fallbackShortName
   const eyebrow = institution?.eyebrow ?? siteTemplate.fallbackEyebrow
 
+  // Institutional primary nav — only working routes with appropriate content sources.
+  // Culture & Heritage / Public Services await Phase 2 content architecture (no dead links).
   const nav = [
     { to: '/', label: tNav('home'), end: true },
-    { to: '/explore', label: tNav('explore') },
-    { to: '/experiences', label: tNav('experiences') },
-    { to: '/plan', label: tNav('plan') },
-    { to: '/stories', label: tNav('stories') },
-    { to: '/map', label: tNav('map') },
+    { to: '/about', label: tNav('about') },
+    { to: '/stories', label: tNav('news') },
+    { to: '/events', label: tNav('events') },
+    { to: '/resources', label: tNav('resources') },
     { to: '/contact', label: tNav('contact') },
   ] as const
 
@@ -125,12 +126,10 @@ export function PublicShell({ institution }: { institution: Institution | null }
           </div>
           <div>
             <h3>{tFooter('explore')}</h3>
-            <Link to="/explore">{tNav('explore')}</Link>
-            <Link to="/experiences">{tNav('experiences')}</Link>
-            <Link to="/plan">{tNav('plan')}</Link>
-            <Link to="/stories">{tNav('stories')}</Link>
-            <Link to="/map">{tNav('map')}</Link>
+            <Link to="/about">{tNav('about')}</Link>
+            <Link to="/stories">{tNav('news')}</Link>
             <Link to="/events">{tNav('events')}</Link>
+            <Link to="/resources">{tNav('resources')}</Link>
             <Link to="/contact">{tNav('contact')}</Link>
             <Link to="/privacy">{tFooter('privacy')}</Link>
           </div>

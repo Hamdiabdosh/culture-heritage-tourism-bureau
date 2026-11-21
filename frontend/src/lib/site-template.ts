@@ -1,7 +1,7 @@
 /**
- * Adopter knobs for the VisitHarar site template.
- * Institution identity (name, contact, content) comes from the PHP API / CMS.
- * Replace hero files under `public/hero/` and edit this list when refreshing photography.
+ * Shared public-site defaults for the Bureau institutional website.
+ * Live institution name/contact/content come from the PHP API / CMS.
+ * Do not invent official logos or seals here — use a text wordmark until the Bureau supplies one.
  */
 export type HeroSlide = {
   /** Path under the SPA public root, e.g. `/hero/hero-01.jpg` */
@@ -20,11 +20,11 @@ export const siteTemplate = {
   heroIntervalMs: 7000,
 
   /** Fallback label when the API has not returned an institution yet. */
-  fallbackInstitutionName: 'VisitHarar' as string,
+  fallbackInstitutionName: 'Harari Culture, Heritage & Tourism Bureau' as string,
 
   /** Fallback short name shown under the brand lockup. */
-  fallbackShortName: 'Harar' as string,
+  fallbackShortName: 'CHTB' as string,
 
   /** Fallback utility-bar eyebrow. */
-  fallbackEyebrow: 'Harari Regional State Tourism Commission' as string,
+  fallbackEyebrow: 'Harari People Regional State' as string,
 } as const

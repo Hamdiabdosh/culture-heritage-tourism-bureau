@@ -8,53 +8,46 @@ web
 
 ## Users
 
-- **Primary:** Travelers planning or arriving in Harar Jugol (often on mobile, on the street) who need trustworthy orientation — what to see, do, and respect.
-- **Secondary:** Harari Regional State Tourism Commission staff (editors, reviewers, admins) who publish verified attractions, experiences, stories, and visitor guidance through the CMS.
+- **Primary:** Residents, researchers, partners, and the general public seeking **official information** from the Harari Culture, Heritage & Tourism Bureau.
+- **Secondary:** Bureau staff (editors, reviewers, admins) who publish institutional news, events, publications, and public information through the CMS.
 
 ## Product Purpose
 
-VisitHarar is the official digital gateway to Harar Jugol — UNESCO World Heritage walled city, "City of Peace," 4th holiest city in Islam. It helps visitors experience Harar (not merely look it up): storytelling, verified local guidance, and practical trip planning. Success means a traveler can find attractions, experiences, etiquette, and next steps without dead ends — and that published content is officially endorsed.
+This is the **official institutional website** of the Harari Culture, Heritage & Tourism Bureau (Harari People Regional State). It communicates the Bureau’s mandate, organization, and activities — culture, heritage preservation and promotion, related public information, news, events, and publications.
+
+It is **not** a visitor booking platform, hotel marketplace, or payment product.
 
 ## Positioning
 
-Experience Harar, don't just visit it. VisitHarar is a storytelling authority and trip planner endorsed by the Tourism Commission. It is **not** a booking engine: no payments or hotel reservations; it connects visitors directly to verified local guesthouses, guides, and community hosts.
+Official government bureau website: clear, trustworthy institutional information. Distinct from any separate tourism-discovery or destination-marketing product (for example Visit Harar / Tourism Commission visitor sites).
 
 ## Operating Context
 
 - Public SPA (`frontend/`) + PHP PDO JSON API (`backend/`) + MySQL (`database/mysql/`).
-- Phase 1 remaps tourism concepts onto existing CMS entities (services → attractions/experiences, news → stories, pages → plan content, events → festivals).
-- Editorial rule: edit does not mean publish; drafts pass review before going live.
-- Mobile-first browsing on variable network conditions.
+- Editorial rule: edit does not mean publish; drafts are reviewed before going live (admin publish gate today; fuller approval/audit in later phases).
+- Interface languages: English, Amharic, Afaan Oromo, and Harari (UI catalogs; deeper content i18n in later phases).
 
-## Capabilities and Constraints
+## Capabilities and Constraints (V1 direction)
 
-- Public routes for discover, explore, experiences, plan, stories, events, map teaser, contact.
-- CMS for institution profile and content entities (with tourism labels in Phase 1).
-- No booking/payments in scope.
-- Dedicated attraction/experience/itinerary tables and a full interactive map are planned for later phases; Phase 1 must not hard-lock government "services/news" IA into public URLs.
+- Institutional public pages: home, about, news/announcements, events, publications/resources, contact (and further culture/heritage/services modules as content architecture lands).
+- CMS for institution profile and content entities.
+- No booking, payments, reservations, or complex visitor management in V1.
 
 ## Brand Commitments
 
-- **Name:** VisitHarar
-- **Endorsement:** Harari Regional State Tourism Commission
-- **Logo:** Jugol gate mark at `frontend/public/brand/visit-harar-logo.webp` (cream wall, saffron yellow bases, turquoise outlines)
-- **Voice:** Warm, welcoming (*Aman Tisheyu*), culturally respectful, story-driven
-- **Palette anchors:** turquoise, saffron yellow, cream/whitewash, terracotta and highland coffee brown (not FDRE green/gold)
-
-## Evidence on Hand
-
-- Product blueprints: VisitHarar website blueprint & system design (external docs)
-- Logo asset: `frontend/public/brand/visit-harar-logo.webp`
-- Hero photography: placeholder slides under `frontend/public/hero/` until authentic Harar images are supplied — do not invent photoreal stock claims
+- **Name:** Harari Culture, Heritage & Tourism Bureau
+- **Voice:** Clear, respectful, institutional; culturally grounded
+- **Logo:** Use an official Bureau asset only when supplied; until then, a text wordmark (do not invent seals or emblems)
+- **Palette:** Prefer existing site tokens; avoid implying FDRE-wide branding unless adopted by the Bureau
 
 ## Product Principles
 
-1. Living heritage over generic tourism brochure.
-2. No dead ends — every page points to a next step (see, do, stay, plan).
-3. Verified and dignified — official endorsement and editorial quality over volume.
-4. Direct community support — introduce locals; do not middleman bookings.
-5. Mobile-first clarity under bright sun and slow networks.
+1. Official information over marketing brochure tone.
+2. No invented facts — leadership, statistics, and policies come from the Bureau.
+3. Preserve working CMS/auth/deploy foundations while correcting product identity.
+4. Multilingual access as a first-class goal (UI now; content depth later).
+5. Clear paths to news, events, publications, and contact.
 
 ## Accessibility & Inclusion
 
-Large, high-contrast type and easy-to-tap targets for outdoor mobile use; respect cultural etiquette guidance for visitors of all faiths and backgrounds.
+Readable type, clear navigation, and easy-to-tap targets; culturally respectful public information for all audiences.
