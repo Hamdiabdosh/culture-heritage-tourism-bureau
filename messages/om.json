@@ -154,7 +154,12 @@
     "title": "About the Bureau",
     "body1": "The Harari Culture, Heritage & Tourism Bureau is a Harari People Regional State institution responsible for culture, heritage, and related public information.",
     "body2": "This website publishes official information about the Bureau’s work, news and announcements, events, and public documents. Details that require confirmation — including leadership names and contact data — are provided by the Bureau through the CMS and office settings.",
-    "body3": "A separate tourism-discovery or destination-marketing product may exist for visitors. This site is the Bureau’s institutional website, not a booking or reservations platform. Contact details in the sidebar come from Site settings."
+    "body3": "A separate tourism-discovery or destination-marketing product may exist for visitors. This site is the Bureau’s institutional website, not a booking or reservations platform. Contact details in the sidebar come from Site settings.",
+    "mission": "Mission",
+    "vision": "Vision",
+    "history": "History",
+    "values": "Core values",
+    "objectives": "Institutional objectives"
   },
   "pages": {
     "eyebrow": "Odeeffannoo",
@@ -631,7 +636,7 @@
     },
     "institution": {
       "title": "Site settings",
-      "intro": "Visitor-facing name and contact details.",
+      "intro": "Visitor-facing name, contact details, and institutional profile used on the public site. Leave unverified fields blank.",
       "name": "Site name",
       "shortName": "Short name",
       "eyebrow": "Eyebrow / bureau line",
@@ -640,7 +645,25 @@
       "address": "Address",
       "phone": "Phone",
       "email": "Email",
-      "hours": "Visitor desk hours"
+      "hours": "Visitor desk hours",
+      "sectionIdentity": "Institutional identity",
+      "sectionMissionVision": "Mission and vision",
+      "sectionHistory": "History",
+      "sectionValues": "Core values",
+      "sectionObjectives": "Institutional objectives",
+      "sectionTranslations": "Translations",
+      "mission": "Mission",
+      "vision": "Vision",
+      "history": "History",
+      "values": "Core values",
+      "objectives": "Objectives",
+      "listPlaceholder": "One item per line",
+      "leaveBlankUntilConfirmed": "Leave blank until officially confirmed",
+      "translationsHint": "Optional Amharic, Afaan Oromo, and Harari overrides for profile fields. English fields above are the default.",
+      "lang_am": "Amharic",
+      "lang_om": "Afaan Oromo",
+      "lang_ha": "Harari",
+      "unsavedChanges": "You have unsaved changes."
     }
   },
   "privacy": {

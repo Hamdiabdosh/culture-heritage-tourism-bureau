@@ -4,9 +4,14 @@
 | Field | Value |
 | --- | --- |
 | **Date** | 21 November 2026 |
-| **Mode** | Planning / inspection only — **no application or schema changes** |
+| **Mode** | Planning approved; Phase 2.1 implements institution profile only |
 | **Architecture doc** | [`docs/architecture/PHASE_2_CONTENT_ARCHITECTURE.md`](../architecture/PHASE_2_CONTENT_ARCHITECTURE.md) |
-| **Git HEAD** | `7a36129` (Phase 1 on `main`) |
+| **Planning commit** | `e51990f945f9d943bf6077babab95b313ec28c7d` |
+| **Prior Phase 1 HEAD** | `7a36129` |
+
+### Approved decisions (recorded)
+
+Shared `content_entries`; About = profile fields + CMS pages; `/news` with `/stories` compat; keep `/resources`; defer PDF upload; identity transition only after verified content + backup; preserve/classify legacy tourism rows; freeform pages in a separate slice.
 
 ---
 
@@ -16,7 +21,7 @@
 | --- | --- |
 | Roadmap / audits | `docs/IMPLEMENTATION_ROADMAP_V1.md`, `docs/audits/PHASE_0_BASELINE_AUDIT.md`, `docs/audits/PHASE_1_IMPLEMENTATION_REPORT.md` |
 | Product / agents | `PRODUCT.md`, `README.md`, `AGENTS.md` |
-| Schema / SQL | `database/mysql/001_schema.sql` … `006_*.sql`, `003_cover_image.sql` |
+| Schema / SQL | `database/mysql/001_schema.sql` … `007_institution_profile_fields.sql` (+ rollback) |
 | API | `backend/routes/api.php`, `InstitutionController`, `PagesController`, `NewsController`, `EventsController`, `ServicesController`, `DocumentsController`, `MediaController`, `ContentPolicy`, `Auth.php` |
 | Frontend | `App.tsx`, `PublicShell.tsx`, `HomePage.tsx`, `AboutPage.tsx`, CMS pages under `pages/cms/`, `content-kind.ts`, `site-template.ts`, `api-client.ts` |
 | i18n | `messages/en.json` (and presence of am/om/ha), `i18n.tsx` pattern from prior audits |
@@ -39,7 +44,7 @@
 
 | Need | Current state |
 | --- | --- |
-| Mission / vision / history / values | **Missing** on `institutions`; About is static message copy |
+| Mission / vision / history / values | **Phase 2.1** adds nullable profile columns + CMS/About (empty until Bureau fills) |
 | Org chart / directorates / leadership | **Missing** tables & APIs |
 | Culture & Heritage archive | **Missing**; tourism `services` heuristic is not a substitute |
 | News kinds (announcement vs press) | Free-text `category` only |

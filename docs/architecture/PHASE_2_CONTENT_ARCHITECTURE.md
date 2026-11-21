@@ -5,8 +5,22 @@
 | **Project** | Harari Culture, Heritage & Tourism Bureau — official institutional website |
 | **Repository** | https://github.com/Hamdiabdosh/culture-heritage-tourism-bureau |
 | **Date** | 21 November 2026 |
-| **Status** | **Planning only — not implemented** |
+| **Status** | Planning approved; **Phase 2.1 implemented locally (awaiting review/commit)** |
+| **Planning commit** | `e51990f945f9d943bf6077babab95b313ec28c7d` |
 | **Depends on** | Phase 0 audit, Phase 1 identity (`7a36129`), Roadmap V1 |
+
+### Approved architecture decisions (2026-11-21)
+
+| Topic | Decision |
+| --- | --- |
+| Culture and Heritage | Shared `content_entries` table |
+| About content | Structured institution profile fields **plus** CMS pages |
+| News route | Introduce `/news`; preserve `/stories` compatibility |
+| Publications route | Keep `/resources` |
+| PDF binary upload | Defer until secure file storage is designed |
+| Institution identity transition | Only after verified official content and backup |
+| Legacy tourism records | Preserve and classify; never blindly delete |
+| Freeform pages | Review and unlock in a **separate** implementation slice |
 
 ---
 
@@ -20,7 +34,7 @@ Verified against source (not docs alone).
 | --- | --- |
 | Frontend | Vite + React 19 + React Router 7 (`frontend/`) |
 | Backend | PHP PDO JSON API (`backend/public/index.php`, `routes/api.php`) |
-| DB | MariaDB/MySQL; base `001_schema.sql` + manual `003`–`006` SQL |
+| DB | MariaDB/MySQL; base `001_schema.sql` + manual `003`–`007` SQL |
 | Auth | Cookie session + CSRF + roles `admin` / `editor` / `viewer` |
 | i18n UI | `messages/{en,am,om,ha}.json` |
 | Content i18n | **`pages.translations` JSON only**; news/events/services/documents are single-language fields |
@@ -360,20 +374,20 @@ Compatibility: old frontend continues if new columns nullable; new frontend feat
 
 ---
 
-## 11. Implementation sequence (after approval)
+## 11. Implementation sequence (approved)
 
 | Step | Work | Depends |
 | --- | --- | --- |
-| 2.1 | SQL `007` institution profile + API/CMS settings | Approval |
+| **2.1** | SQL `007` institution profile fields + API/CMS settings + About integration | Approval ✓ |
 | 2.2 | SQL `008` departments + people + APIs/CMS + `/organization` | 2.1 |
 | 2.3 | SQL `009`–`010` categories, media_assets, content_entries + culture/heritage routes | 2.2 |
-| 2.4 | SQL `011` extend news/events/documents/services + public filters | 2.1 |
-| 2.5 | Unlock pages create; archive VisitHarar guide pages | 2.1 |
-| 2.6 | Controlled institution identity CMS update (data) | Bureau verification |
+| 2.4 | SQL `011` extend news/events/documents/services + public filters; add `/news` with `/stories` redirect | 2.1 |
+| 2.5 | Freeform pages unlock (separate slice) — archive VisitHarar guide pages | After 2.1 review |
+| 2.6 | Controlled institution identity CMS update (data) | Bureau verification + backup |
 | 2.7 | Nav enable Culture, Heritage, Services, Organization | 2.2–2.4 |
 | 2.8 | Smoke tests update + Phase 2 implementation report | End |
 
-Phase 3 can start translation UI depth once `translations` columns exist. Phase 4 adds audit/approval.
+PDF binary upload remains deferred. Phase 3 deepens translations once hooks exist. Phase 4 adds audit/approval.
 
 ---
 
@@ -393,14 +407,14 @@ Phase 3 can start translation UI depth once `translations` columns exist. Phase 
 
 ## 13. Decisions requiring approval
 
-1. **Single `content_entries` table** for Culture + Heritage vs separate tables?
-2. **About content:** extended `institutions` fields vs CMS `pages` only vs both?
-3. **Rename public `/stories` → `/news`** now or keep `/stories` permanently?
-4. **Publications path:** keep `/resources` or introduce `/publications`?
-5. **PDF upload in Phase 2** vs metadata-only until Phase 4?
-6. **When to update live `institutions` row** from VisitHarar → Bureau (who verifies copy)?
-7. **Fate of legacy attraction/experience data:** retain in CMS as legacy kinds, hide, or export-archive?
-8. **Unlock page create** in same implementation PR as org tables, or earlier?
+**Resolved (see table at top):** content_entries; About = profile fields + pages; `/news` + `/stories` compat; keep `/resources`; defer PDF upload; identity transition after verification; preserve legacy tourism rows; freeform pages in a separate slice.
+
+**Still open for later slices:**
+
+1. Timing/owner for live `institutions` identity rename after verified Bureau copy.
+2. Exact `entry_type` vocabulary for culture/heritage.
+3. Whether `/organization` is a single page or nested routes.
+4. When to run freeform-pages unlock relative to 2.2–2.4.
 
 ---
 

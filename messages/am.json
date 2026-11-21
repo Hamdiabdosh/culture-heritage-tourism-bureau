@@ -154,7 +154,12 @@
     "title": "ስለ ቢሮው",
     "body1": "የሐረሪ ባህል፣ ቅርስ እና ቱሪዝም ቢሮ የሐረሪ ህዝብ ክልላዊ መንግስት ተቋም ሲሆን በባህል፣ ቅርስ እና ተያያዥ የህዝብ መረጃ ላይ ይሰራል።",
     "body2": "ይህ ድረ-ገጽ ስለ ቢሮው ስራ፣ ዜና እና ማስታወቂያዎች፣ ዝግጅቶች እና የህዝብ ሰነዶች ኦፊሴላዊ መረጃ ያትማል። ማረጋገጥ የሚፈልጉ ዝርዝሮች — የአመራር ስሞችን እና የእውቂያ መረጃን ጨምሮ — በCMS እና በቢሮ ቅንብሮች በቢሮው ይቀርባሉ።",
-    "body3": "ለጎብኚዎች የተለየ የቱሪዝም ግኝት ወይም መድረሻ ግብይት ምርት ሊኖር ይችላል። ይህ ጣቢያ የቢሮው ተቋማዊ ድረ-ገጽ ነው እንጂ የቦታ ማስያዝ ወይም ክፍያ መድረክ አይደለም። በጎን አሞሌ ያለው የእውቂያ መረጃ ከጣቢያ ቅንብሮች ይመጣል።"
+    "body3": "ለጎብኚዎች የተለየ የቱሪዝም ግኝት ወይም መድረሻ ግብይት ምርት ሊኖር ይችላል። ይህ ጣቢያ የቢሮው ተቋማዊ ድረ-ገጽ ነው እንጂ የቦታ ማስያዝ ወይም ክፍያ መድረክ አይደለም። በጎን አሞሌ ያለው የእውቂያ መረጃ ከጣቢያ ቅንብሮች ይመጣል።",
+    "mission": "ተልዕኮ",
+    "vision": "ራዕይ",
+    "history": "ታሪክ",
+    "values": "ዋና እሴቶች",
+    "objectives": "ተቋማዊ ግቦች"
   },
   "pages": {
     "eyebrow": "መረጃ",
@@ -631,7 +636,7 @@
     },
     "institution": {
       "title": "Site settings",
-      "intro": "Visitor-facing name and contact details.",
+      "intro": "Visitor-facing name, contact details, and institutional profile used on the public site. Leave unverified fields blank.",
       "name": "Site name",
       "shortName": "Short name",
       "eyebrow": "Eyebrow / bureau line",
@@ -640,7 +645,25 @@
       "address": "Address",
       "phone": "Phone",
       "email": "Email",
-      "hours": "Visitor desk hours"
+      "hours": "Visitor desk hours",
+      "sectionIdentity": "Institutional identity",
+      "sectionMissionVision": "Mission and vision",
+      "sectionHistory": "History",
+      "sectionValues": "Core values",
+      "sectionObjectives": "Institutional objectives",
+      "sectionTranslations": "Translations",
+      "mission": "Mission",
+      "vision": "Vision",
+      "history": "History",
+      "values": "Core values",
+      "objectives": "Objectives",
+      "listPlaceholder": "One item per line",
+      "leaveBlankUntilConfirmed": "Leave blank until officially confirmed",
+      "translationsHint": "Optional Amharic, Afaan Oromo, and Harari overrides for profile fields. English fields above are the default.",
+      "lang_am": "Amharic",
+      "lang_om": "Afaan Oromo",
+      "lang_ha": "Harari",
+      "unsavedChanges": "You have unsaved changes."
     }
   },
   "privacy": {

@@ -229,6 +229,14 @@ export type CmsUser = {
   updatedAt: string | null
 }
 
+export type ProfileTranslation = {
+  mission?: string
+  vision?: string
+  history?: string
+  values?: string[]
+  objectives?: string[]
+}
+
 export type Institution = {
   id: string
   name: string
@@ -240,6 +248,12 @@ export type Institution = {
   phone: string | null
   email: string | null
   hours: string | null
+  mission: string | null
+  vision: string | null
+  history: string | null
+  values: string[]
+  objectives: string[]
+  profileTranslations: Partial<Record<'am' | 'om' | 'ha', ProfileTranslation>>
 }
 
 export type InstitutionInput = {
@@ -252,6 +266,12 @@ export type InstitutionInput = {
   phone: string
   email: string
   hours: string
+  mission: string
+  vision: string
+  history: string
+  values: string[]
+  objectives: string[]
+  profileTranslations: Partial<Record<'am' | 'om' | 'ha', ProfileTranslation>>
 }
 
 export const institutionApi = {
