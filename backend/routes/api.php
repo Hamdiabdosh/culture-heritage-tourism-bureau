@@ -47,7 +47,8 @@ return [
     ['method' => 'GET', 'pattern' => '/leadership', 'handler' => [PeopleController::class, 'publicLeadership']],
     ['method' => 'GET', 'pattern' => '/people/{slug}', 'handler' => [PeopleController::class, 'publicShow']],
 
-    // CMS — media
+    // CMS — media (WS1: capabilities + re-encoded upload; registry APIs later)
+    ['method' => 'GET', 'pattern' => '/cms/media/capabilities', 'handler' => [MediaController::class, 'cmsCapabilities']],
     ['method' => 'POST', 'pattern' => '/cms/media', 'handler' => [MediaController::class, 'cmsUpload']],
 
     // CMS — pages

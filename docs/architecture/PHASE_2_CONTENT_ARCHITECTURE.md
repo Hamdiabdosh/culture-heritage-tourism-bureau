@@ -390,7 +390,7 @@ Compatibility: old frontend continues if new columns nullable; new frontend feat
 | --- | --- | --- |
 | **2.1** | SQL `007` institution profile fields + API/CMS settings + About integration | Approval ✓ |
 | **2.2** | SQL `008` departments + people + APIs/CMS + `/organization` (implemented, awaiting review) | 2.1 ✓ |
-| 2.3 | SQL `009`–`010` categories, media_assets, content_entries + culture/heritage routes | 2.2 |
+| 2.3 | SQL `009`–`010` categories, media_assets (+ rights events), content_entries + culture/heritage routes — see `PHASE_2_3_CONTENT_MEDIA_ARCHITECTURE.md` rev 5 + `PHASE_2_3_IMPLEMENTATION_HANDOFF.md` (Stage 1 closed; implement after review) | 2.2 |
 | 2.4 | SQL `011` extend news/events/documents/services + public filters; add `/news` with `/stories` redirect | 2.1 |
 | 2.5 | Freeform pages unlock (separate slice) — archive VisitHarar guide pages | After 2.1 review |
 | 2.6 | Controlled institution identity CMS update (data) | Bureau verification + backup |

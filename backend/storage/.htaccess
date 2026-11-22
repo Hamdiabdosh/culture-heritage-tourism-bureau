@@ -1,0 +1,10 @@
+# Deny all direct HTTP access to storage (uploads, quarantine, backfill-originals).
+# Defence in depth — storage must also live outside the document root (D13).
+<IfModule mod_authz_core.c>
+  Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+  Deny from all
+</IfModule>
+RemoveHandler .php .phtml .php3 .php4 .php5 .php7 .php8 .phar
+php_flag engine off

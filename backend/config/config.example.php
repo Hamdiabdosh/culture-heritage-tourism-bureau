@@ -19,6 +19,12 @@ return [
     'institution_id' => 'CHANGE_ME_UUID',
     'public_origin' => 'https://www.example.gov.et',
     'uploads_dir' => __DIR__ . '/../storage/uploads',
+    'quarantine_dir' => __DIR__ . '/../storage/quarantine',
+    'backfill_originals_dir' => __DIR__ . '/../storage/backfill-originals',
+    // Test/ops only: force upload 503 without removing GD (do not enable in production).
+    'media' => [
+        'force_unavailable' => false,
+    ],
     'session' => [
         'cookie_name' => 'egwp_session',
         'secure' => true, // HTTPS production

@@ -18,6 +18,13 @@ database/mysql/002_seed_dev.sql
 # Uploaded media (local)
 backend/storage/uploads/*
 !backend/storage/uploads/.gitkeep
+backend/storage/quarantine/*
+!backend/storage/quarantine/.gitkeep
+backend/storage/backfill-originals/*
+!backend/storage/backfill-originals/.gitkeep
+
+# Local test fixture generation (Phase 2.3 WS1)
+backend/tmp/
 
 # OS / editor
 .DS_Store

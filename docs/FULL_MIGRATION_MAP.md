@@ -51,26 +51,26 @@ Local/dev (until cutover):
 
 ### Suggested deploy layout (shared host)
 
+**D13 (Phase 2.3 approved):** uploads and private storage must remain **outside** the public web root. Do not place `storage/` under `public_html`.
+
 ```text
-public_html/                 (or httpdocs/)
-├── index.html               ← SPA entry
-├── assets/                  ← Vite build
-├── .htaccess                ← SPA fallback + /api rewrite
-├── api/
-│   └── index.php            ← PHP front controller
-├── app/                     ← outside web root if host allows; else above api with deny
-│   ├── Controllers/
-│   ├── Models/
-│   ├── Services/
-│   ├── Policies/
-│   └── Middleware/
+/home/…/egwp/                ← application root (not web-served)
+├── app/
 ├── routes/
-│   └── api.php
-├── config/                  ← DB credentials (deny web access)
-└── storage/
+├── config/                  ← DB credentials; not web-served
+├── storage/                 ← uploads, quarantine, backfill-originals (not web-served)
+│   ├── uploads/
+│   ├── quarantine/
+│   └── .htaccess            ← Require all denied (defence in depth)
+└── public_html/             (or httpdocs/)  ← document root only
+    ├── index.html           ← SPA entry
+    ├── assets/              ← Vite build
+    ├── .htaccess            ← SPA fallback + /api rewrite
+    └── api/
+        └── index.php        ← PHP front controller (points uploads_dir above)
 ```
 
-If the host cannot place PHP outside the web root, put `config/` behind deny rules. **NEEDS VERIFICATION** per host.
+If the host cannot place PHP code outside the web root, keep at least `storage/` and `config/` above `public_html`, or behind deny-all rules that are verified with a direct URL probe. **NEEDS VERIFICATION** per host before production.
 
 ---
 
