@@ -6,17 +6,26 @@ namespace App\Media;
 /**
  * Server-side image validation + mandatory GD re-encoding (Phase 2.3 WS1).
  *
- * Memory budget (documented for ops):
- * - Reject before decode when area > 24 MP or either edge > 8,000 px (D15).
- * - Worst-case accepted frame ≈ 24e6 pixels × 4 bytes RGBA ≈ 96 MB per GD buffer.
- * - Decode + optional resize holds ~2 buffers ≈ 192 MB, plus PHP/finfo overhead.
- * - Upload route raises memory_limit to 256 MB (single request). Concurrent
- *   workers need ~200 MB headroom each; do not rely on OOM as validation.
- * - Ceiling: multi-worker hosts under memory pressure — upgrade path is lower
- *   pixel caps in config or a queue worker with a higher dedicated limit.
+ * Memory budget (D15 preserved: ≤24 MP, ≤8,000 px/edge, store ≤2,560 px):
  *
- * ponytail: animation detectors are byte-level scanners (GIF descriptors,
- * WebP ANIM/ANMF, PNG acTL). False uncertainty → reject (fail closed).
+ * Peak GD RAM for an accepted upload (RGBA, 4 bytes/pixel):
+ * - Decode holds one full-frame buffer: W×H×4.
+ * - EXIF imagerotate may briefly hold source + rotated ≈ 2×W×H×4.
+ * - Resize (when longest edge > 2,560) holds source + destination concurrently.
+ * - Worst-case peak ≈ max(2×src, src+dst) bytes of image buffers.
+ * - Plus ~32 MB PHP/finfo/temp overhead → required request limit.
+ *
+ * Example at the D15 ceiling (≈24e6 px):
+ * - src ≈ 96 MB; rotate peak ≈ 192 MB; resize to 2560 edge adds a smaller dest.
+ * - Request limit UPLOAD_MEMORY_LIMIT (256M) must be successfully applied and
+ *   read back before decode; otherwise fail closed (503).
+ *
+ * Concurrent workers: each in-flight upload may need ~200–256 MB. A host with
+ * N PHP workers should provision ≈ N × 256 MB RAM for media, or reduce workers /
+ * queue uploads. Do not rely on OOM as validation.
+ *
+ * ponytail: animation detectors are strict byte parsers; incomplete/ambiguous
+ * containers return null → reject before GD (fail closed).
  */
 final class ImageProcessor
 {
@@ -28,6 +37,14 @@ final class ImageProcessor
     public const WEBP_QUALITY = 85;
     public const PNG_COMPRESSION = 6;
     public const UPLOAD_MEMORY_LIMIT = '256M';
+    /** Extra headroom above image-buffer peak for PHP runtime. */
+    public const MEMORY_OVERHEAD_BYTES = 33_554_432; // 32 MiB
+
+    /**
+     * Test-only: when true, ensureUploadMemoryLimit() fails closed.
+     * Never enable in production.
+     */
+    public static bool $simulateMemoryLimitFailure = false;
 
     /** MIME → stored extension. */
     private const ALLOWED = [
@@ -91,8 +108,7 @@ final class ImageProcessor
         if (!empty($info['GIF Read Support']) && !empty($info['GIF Create Support'])) {
             $formats[] = 'gif';
         }
-        $need = ['jpeg', 'png', 'webp', 'gif'];
-        foreach ($need as $f) {
+        foreach (['jpeg', 'png', 'webp', 'gif'] as $f) {
             if (!in_array($f, $formats, true)) {
                 $missing[] = 'gd:' . $f;
             }
@@ -108,6 +124,112 @@ final class ImageProcessor
     {
         $caps = self::capabilities();
         return $caps['ok'] === true;
+    }
+
+    /**
+     * Estimate peak image-buffer bytes for decode + optional EXIF rotate + resize.
+     */
+    public static function estimatePeakImageBytes(int $width, int $height): int
+    {
+        $src = self::frameBytes($width, $height);
+        // Orientation 5–8 swap edges; peak during rotate ≈ 2× source frame.
+        $rotatePeak = 2 * $src;
+
+        $longest = max($width, $height);
+        $dstW = $width;
+        $dstH = $height;
+        if ($longest > self::MAX_STORED_EDGE_PX) {
+            $scale = self::MAX_STORED_EDGE_PX / $longest;
+            $dstW = max(1, (int) round($width * $scale));
+            $dstH = max(1, (int) round($height * $scale));
+        }
+        $resizePeak = $src + self::frameBytes($dstW, $dstH);
+
+        return max($rotatePeak, $resizePeak);
+    }
+
+    public static function requiredMemoryBytes(int $width, int $height): int
+    {
+        return self::estimatePeakImageBytes($width, $height) + self::MEMORY_OVERHEAD_BYTES;
+    }
+
+    /**
+     * Raise and verify the upload memory limit. Returns the previous limit string
+     * for restoration. Fails closed if the effective limit is insufficient.
+     */
+    public static function ensureUploadMemoryLimit(int $width, int $height): string
+    {
+        if (self::$simulateMemoryLimitFailure) {
+            throw new ImageProcessingException(
+                503,
+                'UNAVAILABLE',
+                'Image processing memory limit could not be established.'
+            );
+        }
+
+        $required = self::requiredMemoryBytes($width, $height);
+        $previous = (string) ini_get('memory_limit');
+        $target = self::UPLOAD_MEMORY_LIMIT;
+        $targetBytes = self::parseIniBytes($target);
+
+        if ($targetBytes < $required) {
+            // Defensive: constants must always cover D15 peak; treat as misconfiguration.
+            throw new ImageProcessingException(
+                503,
+                'UNAVAILABLE',
+                'Image processing memory limit could not be established.'
+            );
+        }
+
+        $currentBytes = self::parseIniBytes($previous);
+        if ($currentBytes >= 0 && $currentBytes < $targetBytes) {
+            $set = ini_set('memory_limit', $target);
+            if ($set === false) {
+                throw new ImageProcessingException(
+                    503,
+                    'UNAVAILABLE',
+                    'Image processing memory limit could not be established.'
+                );
+            }
+        }
+
+        $effective = self::parseIniBytes((string) ini_get('memory_limit'));
+        // unlimited (-1) is acceptable; otherwise must meet required peak.
+        if ($effective >= 0 && $effective < $required) {
+            throw new ImageProcessingException(
+                503,
+                'UNAVAILABLE',
+                'Image processing memory limit could not be established.'
+            );
+        }
+
+        return $previous;
+    }
+
+    /**
+     * Parse PHP ini memory shorthand to bytes. -1 means unlimited.
+     */
+    public static function parseIniBytes(string $value): int
+    {
+        $value = trim($value);
+        if ($value === '' || $value === '-1') {
+            return -1;
+        }
+        if (!preg_match('/^(\d+)\s*([KMG])?B?$/i', $value, $m)) {
+            // Numeric plain bytes
+            if (ctype_digit($value)) {
+                return (int) $value;
+            }
+            return 0;
+        }
+        $n = (int) $m[1];
+        $unit = strtoupper($m[2] ?? '');
+        return match ($unit) {
+            'G' => $n * 1024 * 1024 * 1024,
+            'M' => $n * 1024 * 1024,
+            'K' => $n * 1024,
+            default => $n,
+        };
     }
 
     /**
@@ -147,15 +269,14 @@ final class ImageProcessor
         if ($width > self::MAX_EDGE_PX || $height > self::MAX_EDGE_PX) {
             throw new ImageProcessingException(400, 'VALIDATION', 'Image dimensions are too large (max 8,000 pixels per side).');
         }
-        $megapixels = ($width * $height) / 1_000_000;
-        if ($megapixels > self::MAX_MEGAPIXELS) {
+        if (($width * $height) / 1_000_000 > self::MAX_MEGAPIXELS) {
             throw new ImageProcessingException(400, 'VALIDATION', 'Image is too large (max 24 megapixels).');
         }
 
+        // Animation / container integrity — reject before any GD decode.
         self::assertStatic($tmpPath, $canonicalMime);
 
-        $previousLimit = ini_get('memory_limit');
-        @ini_set('memory_limit', self::UPLOAD_MEMORY_LIMIT);
+        $previousLimit = self::ensureUploadMemoryLimit($width, $height);
 
         $image = null;
         $outPath = null;
@@ -187,15 +308,12 @@ final class ImageProcessor
                 }
                 imagedestroy($image);
                 $image = $resized;
-                $srcW = $dstW;
-                $srcH = $dstH;
             }
 
             $outPath = tempnam(sys_get_temp_dir(), 'egwpimg');
             if ($outPath === false) {
                 throw new ImageProcessingException(500, 'SERVER', 'Could not save the image.');
             }
-            // tempnam creates an empty file; encode overwrites it.
             self::encode($image, $outPath, $canonicalMime);
             imagedestroy($image);
             $image = null;
@@ -223,7 +341,7 @@ final class ImageProcessor
                 'tmp_path' => $outPath,
             ];
         } catch (ImageProcessingException $e) {
-            if (is_resource($image) || $image instanceof \GdImage) {
+            if ($image instanceof \GdImage) {
                 imagedestroy($image);
             }
             if (is_string($outPath) && is_file($outPath)) {
@@ -231,7 +349,7 @@ final class ImageProcessor
             }
             throw $e;
         } catch (\Throwable $e) {
-            if (is_resource($image) || $image instanceof \GdImage) {
+            if ($image instanceof \GdImage) {
                 imagedestroy($image);
             }
             if (is_string($outPath) && is_file($outPath)) {
@@ -239,10 +357,15 @@ final class ImageProcessor
             }
             throw new ImageProcessingException(400, 'VALIDATION', 'This image could not be processed.');
         } finally {
-            if (is_string($previousLimit) && $previousLimit !== '') {
+            if ($previousLimit !== '') {
                 @ini_set('memory_limit', $previousLimit);
             }
         }
+    }
+
+    private static function frameBytes(int $w, int $h): int
+    {
+        return $w * $h * 4;
     }
 
     private static function normalizeMime(string $mime): string
@@ -261,15 +384,8 @@ final class ImageProcessor
             'image/webp' => self::webpIsAnimated($path),
             default => false,
         };
-        if ($animated === true) {
-            throw new ImageProcessingException(
-                400,
-                'VALIDATION',
-                'Animated images are not supported. Upload a still image.'
-            );
-        }
-        if ($animated === null) {
-            // Uncertain → reject rather than accept.
+        // true = animated; null = uncertain/malformed — both reject before GD.
+        if ($animated !== false) {
             throw new ImageProcessingException(
                 400,
                 'VALIDATION',
@@ -279,7 +395,9 @@ final class ImageProcessor
     }
 
     /**
-     * @return bool|null true animated, false static, null uncertain
+     * Strict GIF walk. Requires a trailer (0x3B) and terminated image sub-blocks.
+     *
+     * @return bool|null true animated, false static, null incomplete/malformed
      */
     public static function gifIsAnimated(string $path): ?bool
     {
@@ -291,34 +409,32 @@ final class ImageProcessor
             return null;
         }
         $len = strlen($data);
-        $pos = 13; // after header + logical screen descriptor start
-        // Skip global color table if present.
         $packed = ord($data[10]);
+        $pos = 13;
         if ($packed & 0x80) {
             $gctSize = 3 * (1 << (($packed & 0x07) + 1));
             $pos = 13 + $gctSize;
+            if ($pos > $len) {
+                return null;
+            }
         }
+
         $frames = 0;
+        $sawTrailer = false;
         while ($pos < $len) {
             $b = ord($data[$pos]);
             if ($b === 0x3B) { // trailer
+                $sawTrailer = true;
+                $pos++;
                 break;
             }
             if ($b === 0x21) { // extension
-                if ($pos + 2 >= $len) {
+                if ($pos + 2 > $len) {
                     return null;
                 }
-                $pos += 2;
-                while ($pos < $len) {
-                    $block = ord($data[$pos]);
-                    $pos++;
-                    if ($block === 0) {
-                        break;
-                    }
-                    $pos += $block;
-                    if ($pos > $len) {
-                        return null;
-                    }
+                $pos += 2; // introducer + label
+                if (!self::gifSkipDataSubBlocks($data, $len, $pos)) {
+                    return null;
                 }
                 continue;
             }
@@ -327,7 +443,7 @@ final class ImageProcessor
                 if ($frames > 1) {
                     return true;
                 }
-                if ($pos + 10 >= $len) {
+                if ($pos + 10 > $len) {
                     return null;
                 }
                 $localPacked = ord($data[$pos + 9]);
@@ -335,30 +451,48 @@ final class ImageProcessor
                 if ($localPacked & 0x80) {
                     $lct = 3 * (1 << (($localPacked & 0x07) + 1));
                     $pos += $lct;
+                    if ($pos > $len) {
+                        return null;
+                    }
                 }
                 if ($pos >= $len) {
                     return null;
                 }
-                $pos++; // LZW min code size
-                while ($pos < $len) {
-                    $block = ord($data[$pos]);
-                    $pos++;
-                    if ($block === 0) {
-                        break;
-                    }
-                    $pos += $block;
-                    if ($pos > $len) {
-                        return null;
-                    }
+                $pos++; // LZW minimum code size
+                if (!self::gifSkipDataSubBlocks($data, $len, $pos)) {
+                    return null;
                 }
                 continue;
             }
             return null;
         }
-        return $frames === 1 ? false : ($frames === 0 ? null : true);
+
+        if (!$sawTrailer || $frames !== 1) {
+            return null;
+        }
+        return false;
     }
 
-    /** @return bool|null */
+    /** @param-out int $pos */
+    private static function gifSkipDataSubBlocks(string $data, int $len, int &$pos): bool
+    {
+        while ($pos < $len) {
+            $block = ord($data[$pos]);
+            $pos++;
+            if ($block === 0) {
+                return true; // terminated
+            }
+            $pos += $block;
+            if ($pos > $len) {
+                return false;
+            }
+        }
+        return false; // EOF without 0-length terminator
+    }
+
+    /**
+     * @return bool|null true APNG, false static PNG, null malformed/truncated
+     */
     public static function pngIsAnimated(string $path): ?bool
     {
         $fh = fopen($path, 'rb');
@@ -370,12 +504,21 @@ final class ImageProcessor
             fclose($fh);
             return null;
         }
+        $sawIdat = false;
         while (!feof($fh)) {
             $lenData = fread($fh, 4);
-            if ($lenData === false || strlen($lenData) < 4) {
+            if ($lenData === false || strlen($lenData) === 0) {
                 break;
             }
-            $len = unpack('N', $lenData)[1];
+            if (strlen($lenData) < 4) {
+                fclose($fh);
+                return null;
+            }
+            $chunkLen = unpack('N', $lenData)[1];
+            if ($chunkLen > 100_000_000) {
+                fclose($fh);
+                return null;
+            }
             $type = fread($fh, 4);
             if ($type === false || strlen($type) < 4) {
                 fclose($fh);
@@ -385,27 +528,36 @@ final class ImageProcessor
                 fclose($fh);
                 return true;
             }
-            if ($type === 'IDAT' || $type === 'IEND') {
-                fclose($fh);
-                return false;
+            if ($type === 'IDAT') {
+                $sawIdat = true;
             }
-            if ($len > 0) {
-                if (fseek($fh, $len + 4, SEEK_CUR) !== 0) {
+            if ($type === 'IEND') {
+                // Consume data+CRC
+                if ($chunkLen > 0 && fseek($fh, $chunkLen + 4, SEEK_CUR) !== 0) {
                     fclose($fh);
                     return null;
                 }
-            } else {
-                if (fseek($fh, 4, SEEK_CUR) !== 0) { // CRC
+                if ($chunkLen === 0 && fseek($fh, 4, SEEK_CUR) !== 0) {
                     fclose($fh);
                     return null;
                 }
+                fclose($fh);
+                return $sawIdat ? false : null;
+            }
+            if (fseek($fh, $chunkLen + 4, SEEK_CUR) !== 0) {
+                fclose($fh);
+                return null;
             }
         }
         fclose($fh);
         return null;
     }
 
-    /** @return bool|null */
+    /**
+     * Strict WebP: RIFF size must match file length; all chunks complete.
+     *
+     * @return bool|null true animated, false static, null truncated/malformed
+     */
     public static function webpIsAnimated(string $path): ?bool
     {
         $data = @file_get_contents($path);
@@ -415,39 +567,58 @@ final class ImageProcessor
         if (!str_starts_with($data, 'RIFF') || substr($data, 8, 4) !== 'WEBP') {
             return null;
         }
-        // Chunk walk after RIFF header (12) + WEBP fourcc already counted in 12? RIFF size at 4..7, form type at 8..11, then chunks at 12.
-        $len = strlen($data);
+        $fileSize = strlen($data);
+        $riffSize = unpack('V', substr($data, 4, 4))[1];
+        // ChunkSize covers bytes after the size field through end of RIFF body.
+        if ($riffSize + 8 !== $fileSize) {
+            return null;
+        }
+
+        $end = $riffSize + 8;
         $pos = 12;
         $sawAnim = false;
         $sawAnmf = false;
-        $sawVp8 = false;
-        while ($pos + 8 <= $len) {
+        $sawImage = false;
+
+        while ($pos < $end) {
+            if ($pos + 8 > $end) {
+                return null;
+            }
             $fourcc = substr($data, $pos, 4);
             $size = unpack('V', substr($data, $pos + 4, 4))[1];
             $pos += 8;
+            $payloadEnd = $pos + $size;
+            if ($payloadEnd > $end) {
+                return null;
+            }
             if ($fourcc === 'ANIM') {
                 $sawAnim = true;
             } elseif ($fourcc === 'ANMF') {
                 $sawAnmf = true;
             } elseif ($fourcc === 'VP8 ' || $fourcc === 'VP8L' || $fourcc === 'VP8X') {
-                $sawVp8 = true;
-                if ($fourcc === 'VP8X' && $size >= 1 && $pos < $len) {
-                    // Feature flags: bit 1 (0x02) = animation
+                $sawImage = true;
+                if ($fourcc === 'VP8X') {
+                    if ($size < 1) {
+                        return null;
+                    }
                     $flags = ord($data[$pos]);
                     if ($flags & 0x02) {
                         $sawAnim = true;
                     }
                 }
             }
-            $pos += $size + ($size % 2); // pad to even
-            if ($pos > $len) {
+            $pos = $payloadEnd + ($size % 2); // pad to even
+            if ($pos > $end) {
                 return null;
             }
+        }
+        if ($pos !== $end) {
+            return null;
         }
         if ($sawAnim || $sawAnmf) {
             return true;
         }
-        if ($sawVp8) {
+        if ($sawImage) {
             return false;
         }
         return null;
@@ -495,7 +666,6 @@ final class ImageProcessor
             return $image;
         }
         $orientation = (int) $exif['Orientation'];
-        // Unreadable / unknown orientation: leave pixels as-is (not fatal).
         if ($orientation < 2 || $orientation > 8) {
             return $image;
         }

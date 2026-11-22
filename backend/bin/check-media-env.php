@@ -3,9 +3,13 @@
 declare(strict_types=1);
 
 /**
- * Preflight: GD/exif codecs + writable storage outside the document root.
+ * Preflight: GD/exif codecs + configured storage paths outside the document root.
+ * Loads backend/config/config.php when present (same paths as the API).
  * Usage: php bin/check-media-env.php
  * Exit 0 = ready; 1 = not ready.
+ *
+ * Note: .htaccess is Apache defence-in-depth only. nginx/php built-in security
+ * depends on the document root excluding storage (verified below).
  */
 
 $root = dirname(__DIR__);
@@ -23,16 +27,18 @@ spl_autoload_register(static function (string $class) use ($root): void {
 });
 
 use App\Media\ImageProcessor;
-
-$caps = ImageProcessor::capabilities();
-$docRoot = realpath($root . '/public') ?: ($root . '/public');
-$dirs = [
-    'uploads' => $root . '/storage/uploads',
-    'quarantine' => $root . '/storage/quarantine',
-    'backfill-originals' => $root . '/storage/backfill-originals',
-];
+use App\Media\ImageProcessingException;
+use App\Media\StoragePaths;
 
 $ok = true;
+$configFile = $root . '/config/config.php';
+if (!is_file($configFile)) {
+    fwrite(STDERR, 'WARN config.php missing — using default storage paths under backend/' . PHP_EOL);
+} else {
+    echo 'OK   config.php loaded for path resolution' . PHP_EOL;
+}
+
+$caps = ImageProcessor::capabilities();
 if ($caps['ok'] !== true) {
     $ok = false;
     fwrite(STDERR, 'FAIL codecs: missing ' . implode(', ', $caps['missing']) . PHP_EOL);
@@ -49,32 +55,38 @@ if ($caps['ok'] !== true) {
     }
 }
 
-foreach ($dirs as $label => $dir) {
-    if (!is_dir($dir) && !@mkdir($dir, 0750, true) && !is_dir($dir)) {
+$doc = StoragePaths::documentRoot();
+echo 'OK   document_root: ' . $doc . PHP_EOL;
+
+foreach (StoragePaths::all() as $entry) {
+    $label = $entry['label'];
+    $path = $entry['path'];
+    try {
+        $real = StoragePaths::ensureWritableOutsideDocRoot($path, $label);
+        echo "OK   {$label}: {$path}" . ($real !== $path ? " → {$real}" : '') . PHP_EOL;
+    } catch (ImageProcessingException $e) {
         $ok = false;
-        fwrite(STDERR, "FAIL {$label}: cannot create {$dir}" . PHP_EOL);
-        continue;
+        fwrite(STDERR, "FAIL {$label}: {$e->getMessage()} ({$path})" . PHP_EOL);
     }
-    if (!is_writable($dir)) {
-        $ok = false;
-        fwrite(STDERR, "FAIL {$label}: not writable {$dir}" . PHP_EOL);
-        continue;
-    }
-    $real = realpath($dir);
-    if ($real !== false && str_starts_with($real, rtrim($docRoot, '/'))) {
-        $ok = false;
-        fwrite(STDERR, "FAIL {$label}: inside document root ({$real})" . PHP_EOL);
-        continue;
-    }
-    echo "OK   {$label}: {$dir}" . PHP_EOL;
+}
+
+// Memory constants sanity vs D15 peak
+$peak = ImageProcessor::estimatePeakImageBytes(4898, 4898); // ≈24 MP square
+$need = ImageProcessor::requiredMemoryBytes(4898, 4898);
+$limit = ImageProcessor::parseIniBytes(ImageProcessor::UPLOAD_MEMORY_LIMIT);
+if ($limit >= 0 && $limit < $need) {
+    $ok = false;
+    fwrite(STDERR, "FAIL memory: UPLOAD_MEMORY_LIMIT {$limit} < required {$need} (peak buffers {$peak})" . PHP_EOL);
+} else {
+    echo 'OK   memory budget: D15 peak≈' . (int) round($peak / 1048576) . 'MiB buffers + overhead; limit='
+        . ImageProcessor::UPLOAD_MEMORY_LIMIT . PHP_EOL;
 }
 
 $deny = $root . '/storage/.htaccess';
 if (!is_file($deny)) {
-    $ok = false;
-    fwrite(STDERR, 'FAIL storage/.htaccess missing' . PHP_EOL);
+    fwrite(STDERR, 'WARN storage/.htaccess missing (Apache defence-in-depth only; nginx must keep storage outside docroot)' . PHP_EOL);
 } else {
-    echo 'OK   storage/.htaccess present' . PHP_EOL;
+    echo 'OK   storage/.htaccess present (Apache only; not an nginx boundary)' . PHP_EOL;
 }
 
 exit($ok ? 0 : 1);

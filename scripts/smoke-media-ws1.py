@@ -177,6 +177,20 @@ def ensure_fixtures() -> None:
     )
     (FIX / "animated.png").write_bytes(apng)
 
+    # Malformed / truncated containers (must reject before GD)
+    (FIX / "trunc.gif").write_bytes(b"GIF89a" + b"\x00" * 7)
+    static_gif = (FIX / "static.gif").read_bytes()
+    if static_gif.endswith(b";"):
+        (FIX / "notrail.gif").write_bytes(static_gif[:-1])
+    else:
+        (FIX / "notrail.gif").write_bytes(static_gif)
+    static_webp = (FIX / "static.webp").read_bytes()
+    (FIX / "trunc.webp").write_bytes(static_webp[:20])
+    lie = bytearray(static_webp)
+    lie[4] = 0xFF
+    lie[5] = 0xFF
+    (FIX / "riff_lie.webp").write_bytes(bytes(lie))
+
 
 def unlink_upload(name: str) -> None:
     path = ROOT / "backend" / "storage" / "uploads" / name
@@ -271,12 +285,56 @@ echo json_encode(["gif_static"=>$g,"gif_anim"=>$a,"webp_static"=>$w,"webp_anim"=
         ("animated GIF", "animated.gif"),
         ("animated WebP", "animated.webp"),
         ("animated PNG", "animated.png"),
+        ("truncated GIF", "trunc.gif"),
+        ("GIF without trailer", "notrail.gif"),
+        ("truncated WebP", "trunc.webp"),
+        ("WebP RIFF lie", "riff_lie.webp"),
     ]:
         st, body = editor.upload(FIX / fname)
         check(f"reject {label} → 400", st == 400, body)
         err = (body or {}).get("error", {}) if isinstance(body, dict) else {}
         msg = err.get("message", "") if isinstance(err, dict) else str(body)
-        check(f"reject {label} message", "Animated" in msg, msg)
+        check(f"reject {label} has message", isinstance(msg, str) and len(msg) > 0, msg)
+
+    # Detector nulls for malformed (uncertain → reject)
+    det2 = subprocess.run(
+        [
+            "docker", "compose", "exec", "-T", "api", "php", "-r",
+            r'''
+require "/var/www/backend/app/Media/ImageProcessingException.php";
+require "/var/www/backend/app/Media/ImageProcessor.php";
+use App\Media\ImageProcessor;
+$d="/var/www/backend/tmp/media-ws1-fixtures";
+echo json_encode([
+  "trunc_gif"=>ImageProcessor::gifIsAnimated("$d/trunc.gif"),
+  "notrail"=>ImageProcessor::gifIsAnimated("$d/notrail.gif"),
+  "trunc_webp"=>ImageProcessor::webpIsAnimated("$d/trunc.webp"),
+  "lie"=>ImageProcessor::webpIsAnimated("$d/riff_lie.webp"),
+]);
+''',
+        ],
+        cwd=str(ROOT),
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    d2 = json.loads(det2.stdout.strip().splitlines()[-1])
+    check("trunc GIF detector null", d2["trunc_gif"] is None, d2)
+    check("notrail GIF detector null", d2["notrail"] is None, d2)
+    check("trunc WebP detector null", d2["trunc_webp"] is None, d2)
+    check("RIFF lie WebP detector null", d2["lie"] is None, d2)
+
+    # Audit suite (memory, EXIF, max-size, storage symlink)
+    audit_src = ROOT / "scripts" / "test-media-ws1-audit.php"
+    audit_dst = ROOT / "backend" / "tmp" / "test-media-ws1-audit.php"
+    audit_dst.write_bytes(audit_src.read_bytes())
+    audit = subprocess.run(
+        ["docker", "compose", "exec", "-T", "api", "php", "/var/www/backend/tmp/test-media-ws1-audit.php"],
+        cwd=str(ROOT),
+        capture_output=True,
+        text=True,
+    )
+    check("audit suite exit 0", audit.returncode == 0, audit.stderr or audit.stdout[-500:])
 
     st, body = editor.upload(FIX / "fake.html.jpg", filename="x.jpg", content_type="image/jpeg")
     check("reject HTML masquerade → 400", st == 400, body)

@@ -6,6 +6,7 @@ namespace App\Controllers;
 use App\Db;
 use App\Media\ImageProcessingException;
 use App\Media\ImageProcessor;
+use App\Media\StoragePaths;
 use App\Policies\ContentPolicy;
 
 /**
@@ -32,6 +33,7 @@ final class MediaController
                 'maxEdgePx' => ImageProcessor::MAX_EDGE_PX,
                 'maxStoredEdgePx' => ImageProcessor::MAX_STORED_EDGE_PX,
                 'memoryLimit' => ImageProcessor::UPLOAD_MEMORY_LIMIT,
+                'memoryOverheadBytes' => ImageProcessor::MEMORY_OVERHEAD_BYTES,
             ],
             'missing' => $forced ? ['forced_unavailable'] : ($caps['ok'] === true ? [] : $caps['missing']),
         ]);
@@ -65,17 +67,15 @@ final class MediaController
             json_error(400, 'VALIDATION', 'Image must be under 5 MB.');
         }
 
-        self::ensureStorageDirs();
-
         try {
+            self::ensureStorageDirs();
             $processed = ImageProcessor::processUpload($tmp);
         } catch (ImageProcessingException $e) {
             json_error($e->status, $e->errorCode, $e->getMessage());
         }
 
         $name = uuid_v4() . '.' . $processed['ext'];
-        $dest = self::uploadsDir() . DIRECTORY_SEPARATOR . $name;
-        // Place re-encoded bytes only — never move the raw upload into storage.
+        $dest = StoragePaths::uploads() . DIRECTORY_SEPARATOR . $name;
         if (!@rename($processed['tmp_path'], $dest)) {
             if (!@copy($processed['tmp_path'], $dest)) {
                 @unlink($processed['tmp_path']);
@@ -104,7 +104,7 @@ final class MediaController
             json_error(404, 'NOT_FOUND', 'Image not found.');
         }
 
-        $path = self::uploadsDir() . DIRECTORY_SEPARATOR . $file;
+        $path = StoragePaths::uploads() . DIRECTORY_SEPARATOR . $file;
         if (!is_file($path)) {
             json_error(404, 'NOT_FOUND', 'Image not found.');
         }
@@ -119,7 +119,6 @@ final class MediaController
         };
 
         // WS1: keep filename-based public serving for existing URL compatibility.
-        // Registry gate + D11 cache change arrive with later workstreams.
         header('Content-Type: ' . $mime);
         header('Content-Length: ' . (string) filesize($path));
         header('Cache-Control: public, max-age=31536000, immutable');
@@ -132,7 +131,6 @@ final class MediaController
 
     private static function forceUnavailable(): bool
     {
-        // Ops/test escape hatch — never enable in production config.
         if (getenv('EGWP_MEDIA_FORCE_UNAVAILABLE') === '1') {
             return true;
         }
@@ -142,46 +140,9 @@ final class MediaController
 
     private static function ensureStorageDirs(): void
     {
-        foreach ([self::uploadsDir(), self::quarantineDir(), self::backfillOriginalsDir()] as $dir) {
-            if (!is_dir($dir) && !mkdir($dir, 0750, true) && !is_dir($dir)) {
-                json_error(500, 'SERVER', 'Could not create uploads folder.');
-            }
+        foreach (StoragePaths::all() as $entry) {
+            StoragePaths::ensureWritableOutsideDocRoot($entry['path'], $entry['label']);
         }
-        $docRoot = realpath(dirname(__DIR__, 2) . '/public');
-        $uploadsReal = realpath(self::uploadsDir());
-        if ($docRoot !== false && $uploadsReal !== false && str_starts_with($uploadsReal, $docRoot)) {
-            json_error(500, 'SERVER', 'Uploads directory must be outside the public web root.');
-        }
-    }
-
-    private static function uploadsDir(): string
-    {
-        $config = Db::config();
-        $configured = $config['uploads_dir'] ?? null;
-        if (is_string($configured) && $configured !== '') {
-            return $configured;
-        }
-        return dirname(__DIR__, 2) . '/storage/uploads';
-    }
-
-    private static function quarantineDir(): string
-    {
-        $config = Db::config();
-        $configured = $config['quarantine_dir'] ?? null;
-        if (is_string($configured) && $configured !== '') {
-            return $configured;
-        }
-        return dirname(__DIR__, 2) . '/storage/quarantine';
-    }
-
-    private static function backfillOriginalsDir(): string
-    {
-        $config = Db::config();
-        $configured = $config['backfill_originals_dir'] ?? null;
-        if (is_string($configured) && $configured !== '') {
-            return $configured;
-        }
-        return dirname(__DIR__, 2) . '/storage/backfill-originals';
     }
 
     private static function uploadErrorMessage(int $code): string
